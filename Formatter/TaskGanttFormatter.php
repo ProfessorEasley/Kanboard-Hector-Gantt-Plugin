@@ -8,6 +8,25 @@ use Kanboard\Formatter\BaseFormatter;
 /**
  * Task Gantt Formatter for DHtmlX Gantt
  *
+ * KB_Backend_Formatter
+ *   - Shapes Kanboard task records into the data structures used by
+ *     the frontend DHTMLX Gantt chart.
+ *
+ * KB_Sprints_Logic
+ *   - Resolves sprint IDs, sprint child tasks, and sprint duration
+ *     information for the chart.
+ *
+ * KB_Task_Types
+ *   - Maps metadata (task_type, is_milestone) into the fields consumed
+ *     by the JS side and preserves those types across saves.
+ *
+ * KB_Grouping_Assignee / KB_Grouping_Category / KB_Grouping_Sprint
+ *   - Provides grouping keys and labels for assignee, category, and
+ *     sprint grouping modes.
+ *
+ * See KB_COMMENT_TABLE.md for a full description of the KB_* tags used
+ * across this plugin.
+ *
  * @package  Kanboard\Plugin\DhtmlGantt\Formatter
  * @author   Your Development Team
  */
@@ -33,10 +52,9 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
      */
     private $groupCache = array();
 
-    // NEW:
+    // ===== KB_Grouping_Assignee / KB_Grouping_Category / KB_Grouping_Sprint =====
     protected $groupBy = 'none'; // 'none' | 'group' | 'assignee' | 'sprint'
 
-    // NEW:
     public function setGroupBy(string $mode)
     {
         $allowed = ['none','group','assignee','sprint'];
@@ -156,6 +174,7 @@ class TaskGanttFormatter extends BaseFormatter implements FormatterInterface
 
     }
 
+    // ===== KB_Task_Types / KB_Backend_Formatter: Format task for DHTMLX Gantt =====
     /**
      * Format a single task for DHtmlX Gantt
      *

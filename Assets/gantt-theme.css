@@ -1,7 +1,20 @@
 /*
- * Kanboard DHtmlX Gantt Plugin - Custom Styles
- * 
- * Additional CSS for Kanboard integration
+ * Kanboard DHtmlX Gantt Plugin - Main Theme Styles
+ *
+ * KB_DarkMode_Styling
+ *   - Dark/bright mode styling for legend, grid, headers, text colors.
+ *
+ * KB_Workload_Busyness
+ *   - Workload panel layout and busyness border classes on tasks.
+ *
+ * KB_Lightbox_UI
+ *   - Lightbox layout tweaks (field visibility, sizing).
+ *
+ * KB_Name_Display
+ *   - Visual presentation of labels in the grid, legend, and workload.
+ *
+ * Note: Vendor DHTMLX CSS lives in `dhtmlxgantt.css`. This file should
+ * contain only Kanboard-specific overrides and theme styling.
  */
 
 /* Hide Type field by default to prevent flash - will be shown only for new tasks */
@@ -291,7 +304,7 @@ body.gantt-dark-mode .gantt-sprint-create-link a {
     box-shadow: 0 0 10px rgba(102, 126, 234, 0.6);
 }
 
-/* Milestone Styles - Green Color */
+/* ===== KB_Task_Types: Milestone Styles - Green Color ===== */
 .gantt_task_line.gantt_milestone,
 .gantt_task_line.milestone-block {
     background-color: #27ae60 !important;
@@ -331,7 +344,7 @@ body.gantt-dark-mode .gantt-sprint-create-link a {
     display: none !important;
 }
 
-/* Sprint Styles - Purple */
+/* ===== KB_Sprints_Logic: Sprint Styles - Purple ===== */
 .gantt_task_line.sprint-block {
     background-color: #9b59b6 !important;
     border-color: #8e44ad !important;
@@ -516,7 +529,8 @@ body.gantt-dark-mode .gantt-sprint-create-link a {
     text-shadow: 0 1px 2px rgba(255,255,255,0.8) !important;
 }
 
-/* Workload-based border colors - ONLY border, keep fill color from group */
+/* ===== KB_Workload_Busyness: Workload-based border colors ===== */
+/* ONLY border, keep fill color from group */
 /* These borders are shown by default and hidden when .hide-busyness-borders class is present */
 .gantt_task_line.workload-available {
     border: 3px solid #27ae60 !important; /* Green border for available */
@@ -797,7 +811,7 @@ body.gantt-dark-mode .gantt_link_arrow {
     background-color: transparent !important;
 }
 
-/* Note: Arrow head styling (border-based triangles) is in gantt-csp-fix.css */
+/* Note: Arrow head styling (border-based triangles) is in gantt-overrides.css */
 
 body.gantt-dark-mode .gantt_link_point,
 body.gantt-dark-mode .gantt_link_control .gantt_link_point,
@@ -827,7 +841,7 @@ body.gantt-dark-mode .gantt_task_progress_text {
     text-shadow: 0 1px 2px rgba(0,0,0,0.8) !important;
 }
 
-/* Dark mode toolbar */
+/* ===== KB_DarkMode_Styling: Dark mode toolbar ===== */
 body.gantt-dark-mode .dhtmlx-gantt-toolbar {
     background: #1e1e1f !important;
     border-color: #2a2a2a !important;

@@ -7,6 +7,16 @@ use Kanboard\Core\Base;
 /**
  * Project Gantt Formatter
  *
+ * KB_Backend_Formatter
+ *   - Aggregates project task data into the simple `data` + `links`
+ *     structure used by the project-level Gantt view.
+ *
+ * KB_Task_Dependencies
+ *   - Formats dependency links between tasks for the project Gantt.
+ *
+ * See KB_COMMENT_TABLE.md for a full description of the KB_* tags used
+ * across this plugin.
+ *
  * @package Kanboard\Plugin\DhtmlGantt\Formatter
  * @author  Your Name
  */

@@ -1,257 +1,55 @@
-// /*
-//  * DHtmlX Gantt Initialization Script for Kanboard
-//  */
-
-// document.addEventListener('DOMContentLoaded', function() {
-//     console.log('DOM loaded, initializing DHtmlX Gantt...')
-    
-//     // Initialize DHtmlX Gantt
-//     var initialized = initDhtmlxGantt();
-    
-//     if (!initialized) {
-//         console.error('Failed to initialize DHtmlX Gantt');
-//         return;
-//     }
-//     // Load task data - this will be set by the template
-//     if (typeof window.taskData !== 'undefined') {
-//         console.log('Task data:', window.taskData);
-//         console.log('Task count:', window.taskData && window.taskData.data ? window.taskData.data.length : 'No data structure');
-//         loadGanttData(window.taskData);
-//     } else {
-//         console.warn('No task data found on window.taskData');
-//         // Load empty data to show the interface
-//         loadGanttData({data: [], links: []});
-//     }
-    
-//     // Setup event handlers
-//     setupGanttEventHandlers();
-// });
-
-// function initDhtmlxGantt() {
-//     // Check if DHtmlX Gantt library is loaded
-//     if (typeof gantt === 'undefined') {
-//         console.error('DHtmlX Gantt library not loaded!');
-//         return false;
-//     }
-    
-//     // Check if the container element exists
-//     var container = document.getElementById('dhtmlx-gantt-chart');
-//     if (!container) {
-//         console.error('Gantt container element not found! Looking for #dhtmlx-gantt-chart');
-//         return false;
-//     }
-    
-//     console.log('Initializing DHtmlX Gantt...', container);
-    
-//     // Configure DHtmlX Gantt
-//     gantt.config.date_format = "%Y-%m-%d %H:%i";
-//     gantt.config.xml_date = "%Y-%m-%d %H:%i";
-//     gantt.config.scale_unit = "day";
-//     gantt.config.date_scale = "%d %M";
-//     gantt.config.subscales = [
-//         {unit: "hour", step: 1, date: "%H"}
-//     ];
-    
-//     // Ensure grid is visible
-//     gantt.config.grid_width = 400;
-//     gantt.config.show_grid = true;
-    
-//     // Enable plugins
-//     gantt.plugins({
-//         tooltip: true,
-//         keyboard_navigation: true,
-//         undo: true
-//     });
-    
-//     // Configure columns
-//     gantt.config.columns = [
-//         {name: "text", label: "Task Name", tree: true, width: 200, resize: true},
-//         {name: "start_date", label: "Start Date", align: "center", width: 100, resize: true},
-//         {name: "duration", label: "Duration", align: "center", width: 60, resize: true},
-//         {name: "progress", label: "Progress", align: "center", width: 80, resize: true},
-//         {name: "priority", label: "Priority", align: "center", width: 80, resize: true},
-//         {name: "add", label: "", width: 44}
-//     ];
-    
-//     // Custom task styling
-//     gantt.templates.task_class = function(start, end, task) {
-//         var className = "";
-//         if (task.priority) {
-//             className += "dhtmlx-priority-" + task.priority + " ";
-//         }
-//         if (task.readonly) {
-//             className += "dhtmlx-readonly ";
-//         }
-//         return className;
-//     };
-    
-//     // Progress template
-//     gantt.templates.progress_text = function(start, end, task) {
-//         return "<span>" + Math.round(task.progress * 100) + "% </span>";
-//     };
-    
-//     // Tooltip template
-//     gantt.templates.tooltip_text = function(start, end, task) {
-//         return "<b>Task:</b> " + task.text + "<br/>" +
-//                "<b>Start:</b> " + gantt.templates.tooltip_date_format(start) + "<br/>" +
-//                "<b>End:</b> " + gantt.templates.tooltip_date_format(end) + "<br/>" +
-//                "<b>Progress:</b> " + Math.round(task.progress * 100) + "%<br/>" +
-//                "<b>Priority:</b> " + (task.priority || 'normal');
-//     };
-    
-//     // Initialize Gantt
-//     try {
-//         gantt.init("dhtmlx-gantt-chart");
-//         console.log('DHtmlX Gantt initialized successfully');
-//         return true;
-//     } catch (error) {
-//         console.error('Error initializing DHtmlX Gantt:', error);
-//         return false;
-//     }
-// }
-
-// function loadGanttData(data) {
-//     console.log('Loading Gantt data...', data);
-    
-//     if (data && data.data) {
-//         console.log('Using data.data format, tasks:', data.data.length);
-//         gantt.parse(data);
-//     } else if (Array.isArray(data)) {
-//         console.log('Using array format, tasks:', data.length);
-//         gantt.parse({data: data, links: []});
-//     } else {
-//         console.log('No valid data, creating empty gantt');
-//         gantt.parse({data: [], links: []});
-//     }
-    
-//     updateStatistics();
-// }
-
-// function setupGanttEventHandlers() {
-//     // Data processor for CRUD operations - URLs will be set by template
-//     if (typeof window.ganttUrls !== 'undefined') {
-//         var dp = new gantt.dataProcessor({
-//             task: {
-//                 update: window.ganttUrls.update,
-//                 create: window.ganttUrls.create,
-//                 delete: window.ganttUrls.remove
-//             },
-//             link: {
-//                 create: window.ganttUrls.createLink,
-//                 delete: window.ganttUrls.removeLink
-//             }
-//         });
-//         dp.init(gantt);
-//     }
-    
-//     // Toolbar event handlers
-//     var addTaskBtn = document.getElementById('dhtmlx-add-task');
-//     if (addTaskBtn) {
-//         addTaskBtn.addEventListener('click', function() {
-//             gantt.createTask();
-//         });
-//     }
-    
-//     var zoomInBtn = document.getElementById('dhtmlx-zoom-in');
-//     if (zoomInBtn) {
-//         zoomInBtn.addEventListener('click', function() {
-//             gantt.ext.zoom.zoomIn();
-//         });
-//     }
-    
-//     var zoomOutBtn = document.getElementById('dhtmlx-zoom-out');
-//     if (zoomOutBtn) {
-//         zoomOutBtn.addEventListener('click', function() {
-//             gantt.ext.zoom.zoomOut();
-//         });
-//     }
-    
-//     var fitBtn = document.getElementById('dhtmlx-fit');
-//     if (fitBtn) {
-//         fitBtn.addEventListener('click', function() {
-//             gantt.ext.zoom.setLevel("month");
-//         });
-//     }
-    
-//     // View mode buttons
-//     document.querySelectorAll('.btn-dhtmlx-view').forEach(function(btn) {
-//         btn.addEventListener('click', function() {
-//             // Remove active class from all buttons
-//             document.querySelectorAll('.btn-dhtmlx-view').forEach(function(b) {
-//                 b.classList.remove('active');
-//             });
-//             // Add active class to clicked button
-//             this.classList.add('active');
-            
-//             // Change view mode
-//             const view = this.getAttribute('data-view');
-//             changeViewMode(view);
-//         });
-//     });
-    
-//     // Update statistics when tasks change
-//     gantt.attachEvent("onAfterTaskUpdate", updateStatistics);
-//     gantt.attachEvent("onAfterTaskAdd", updateStatistics);
-//     gantt.attachEvent("onAfterTaskDelete", updateStatistics);
-// }
-
-// function changeViewMode(mode) {
-//     switch(mode) {
-//         case 'Quarter Day':
-//             gantt.config.scale_unit = "hour";
-//             gantt.config.date_scale = "%H";
-//             gantt.config.subscales = [{unit: "minute", step: 15, date: "%i"}];
-//             break;
-//         case 'Half Day':
-//             gantt.config.scale_unit = "hour";
-//             gantt.config.date_scale = "%H";
-//             gantt.config.subscales = [{unit: "minute", step: 30, date: "%i"}];
-//             break;
-//         case 'Day':
-//             gantt.config.scale_unit = "day";
-//             gantt.config.date_scale = "%d %M";
-//             gantt.config.subscales = [{unit: "hour", step: 1, date: "%H"}];
-//             break;
-//         case 'Week':
-//             gantt.config.scale_unit = "week";
-//             gantt.config.date_scale = "Week #%W";
-//             gantt.config.subscales = [{unit: "day", step: 1, date: "%d %M"}];
-//             break;
-//         case 'Month':
-//             gantt.config.scale_unit = "month";
-//             gantt.config.date_scale = "%F %Y";
-//             gantt.config.subscales = [{unit: "day", step: 1, date: "%d"}];
-//             break;
-//     }
-//     gantt.render();
-// }
-
-// function updateStatistics() {
-//     var tasks = gantt.getTaskByTime();
-//     var completed = 0;
-//     var inProgress = 0;
-    
-//     tasks.forEach(function(task) {
-//         if (task.progress >= 1) {
-//             completed++;
-//         } else if (task.progress > 0) {
-//             inProgress++;
-//         }
-//     });
-    
-//     var completedElement = document.getElementById('dhtmlx-completed-count');
-//     var progressElement = document.getElementById('dhtmlx-progress-count');
-    
-//     if (completedElement) completedElement.textContent = completed;
-//     if (progressElement) progressElement.textContent = inProgress;
-// }
-
-
-
-
 /*
  * DHtmlX Gantt Initialization Script for Kanboard
+ *
+ * TABLE OF CONTENTS (search for the KB_* tags below):
+ *
+ * KB_Init_Core
+ *   - Base gantt config, columns, templates, lightbox layout, and
+ *     overall initialization flow.
+ *
+ * KB_Lightbox_UI
+ *   - Lightbox sections and UI wiring: type selector, sprint selector,
+ *     task multi-select, and "View in Kanboard" button.
+ *
+ * KB_Sprints_Logic
+ *   - Sprint creation, inline sprint flow, sprint child task management,
+ *     and sprint duration recalculation.
+ *
+ * KB_Task_Types
+ *   - Preserving and mapping task_type (task / milestone / sprint) on
+ *     the frontend and when saving to Kanboard.
+ *
+ * KB_Task_Dependencies
+ *   - Dependency rules, link creation/removal, move-with-dependencies
+ *     behavior, and arrow head styling.
+ *
+ * KB_Zoom_And_Views
+ *   - Zoom buttons, Day/Week/Month modes, smart fit-to-screen, and
+ *     persistence of zoom/view settings across reloads.
+ *
+ * KB_Workload_Busyness
+ *   - Workload panel, workload/busyness calculations, and the visual
+ *     borders that show busyness on task bars.
+ *
+ * KB_Grouping_Assignee / KB_Grouping_Category / KB_Grouping_Sprint
+ *   - Group-by utilities and data shaping for assignee, category, and
+ *     sprint grouping modes.
+ *
+ * KB_DarkMode_Styling
+ *   - Dark/bright mode toggle behavior and theme-specific styling
+ *     (including arrow colors).
+ *
+ * KB_Interactive_Schedule
+ *   - User experience upgrades: tooltips, context menu, keyboard
+ *     shortcuts, and other interactive helpers.
+ *
+ * KB_CSP_And_Assets
+ *   - Notes about how this script is loaded alongside the DHTMLX
+ *     library and CSS override layers. See KB_COMMENT_TABLE.md for a
+ *     full KB_* index used across the plugin.
  */
+
+// ===== KB_Lightbox_UI: Global state used by lightbox helpers and sprint selector =====
 
 // Store users and categories data globally (defined early)
 window.projectUsers = [];
@@ -435,6 +233,7 @@ function setupDateGroupValidation(group) {
     }
 }
 
+// ===== KB_Sprints_Logic: Sprint selector in lightbox =====
 function setupSprintSelector(retryCount) {
     retryCount = retryCount || 0;
     var lightbox = document.querySelector('.gantt_cal_light');
@@ -631,6 +430,7 @@ function ensureInlineOriginTask(flow) {
     return restoredId;
 }
 
+// ===== KB_Sprints_Logic: Inline sprint creation flow =====
 function beginInlineSprintCreation() {
     if (typeof gantt === 'undefined') return;
     var state = gantt.getState ? gantt.getState() : null;
@@ -649,7 +449,6 @@ function beginInlineSprintCreation() {
     
     // For new tasks, ensure task_type is 'task' (user might have changed dropdown to see sprint options)
     if (isNewTask && originTask.task_type === 'sprint') {
-        console.log('New task was showing as sprint type, resetting to task for snapshot');
         originTask.task_type = 'task';
         originTask.type = 'task';
     }
@@ -689,7 +488,6 @@ function beginInlineSprintCreation() {
 
     var sprintId = gantt.createTask(sprintData, 0);
     window.__inlineSprintFlow.sprintTempId = sprintId;
-    console.log('🚀 Created inline sprint with temp ID:', sprintId, 'type:', typeof sprintId);
     
     // Clear the starting flag now that sprint is created
     window.__inlineSprintFlowStarting = false;
@@ -697,18 +495,17 @@ function beginInlineSprintCreation() {
     gantt.showLightbox(sprintId);
 }
 
+// ===== KB_Sprints_Logic: Finalize inline sprint creation =====
 function finalizeInlineSprintFlow(closedTaskId, opts) {
     var flow = window.__inlineSprintFlow;
     if (!flow) return false;
     
-    console.log('finalizeInlineSprintFlow called with closedTaskId:', closedTaskId, 'flow:', flow);
     
     // Check if the sprint was saved (flag set in onLightboxSave)
     var sprintWasSaved = flow.sprintSaved === true;
     
     if (!sprintWasSaved && flow.sprintTempId) {
         // Sprint was cancelled - delete the temporary sprint task
-        console.log('Sprint was cancelled, deleting temp sprint task:', flow.sprintTempId);
         
         // Try to delete by temp ID (don't send to server since it was never saved)
         if (gantt.isTaskExists(flow.sprintTempId)) {
@@ -722,11 +519,9 @@ function finalizeInlineSprintFlow(closedTaskId, opts) {
             }
         }
     } else if (sprintWasSaved) {
-        console.log('Sprint was saved successfully, keeping it.');
     }
 
     var restoredId = ensureInlineOriginTask(flow);
-    console.log('Restored task ID:', restoredId);
     
     if (restoredId && gantt.isTaskExists(restoredId)) {
         var restoredTask = gantt.getTask(restoredId);
@@ -735,12 +530,10 @@ function finalizeInlineSprintFlow(closedTaskId, opts) {
         restoredTask.task_type = 'task';
         restoredTask.type = 'task';
         restoredTask.is_milestone = false;
-        console.log('Reset task_type to task for restored task:', restoredId);
         
         // Check if we have a pending sprint assignment from the async callback
         var pendingAssignment = window.__pendingSprintIdForTask;
         if (pendingAssignment && String(pendingAssignment.taskId) === String(restoredId) && pendingAssignment.sprintId) {
-            console.log('📦 Applying pending sprint assignment:', pendingAssignment.sprintId);
             restoredTask.sprint_id = pendingAssignment.sprintId;
             restoredTask.parent = pendingAssignment.sprintId;
             // DON'T clear the pending assignment yet - let resolveSprintSelectionForTask use it
@@ -766,7 +559,6 @@ function finalizeInlineSprintFlow(closedTaskId, opts) {
             // Check again for pending assignment (in case async just completed)
             var pendingAssignment2 = window.__pendingSprintIdForTask;
             if (pendingAssignment2 && String(pendingAssignment2.taskId) === String(taskIdToRestore) && pendingAssignment2.sprintId) {
-                console.log('📦 Late applying pending sprint assignment:', pendingAssignment2.sprintId);
                 if (gantt.isTaskExists(taskIdToRestore)) {
                     var task = gantt.getTask(taskIdToRestore);
                     task.sprint_id = pendingAssignment2.sprintId;
@@ -774,7 +566,6 @@ function finalizeInlineSprintFlow(closedTaskId, opts) {
                 }
             }
             
-            console.log('Re-opening original task lightbox:', taskIdToRestore, 'with task_type: task');
             
             // IMPORTANT: Explicitly select the task before showing lightbox
             gantt.selectTask(taskIdToRestore);
@@ -787,7 +578,6 @@ function finalizeInlineSprintFlow(closedTaskId, opts) {
         var waitForSprint = function() {
             waitCount++;
             if (window.__inlineSprintCreationComplete || waitCount >= maxWait) {
-                console.log('📦 Opening lightbox after wait count:', waitCount, 'complete:', window.__inlineSprintCreationComplete);
                 openLightboxForTask();
             } else {
                 setTimeout(waitForSprint, 100);
@@ -823,6 +613,7 @@ function getCategoryColorHex(categoryId) {
     return defaultColor;
 }
 
+// ===== KB_Task_Types: Sprint detection helper =====
 function isSprintTask(task) {
     if (!task) {
         return false;
@@ -878,8 +669,6 @@ function refreshSprintSectionOptions() {
 function resolveSprintSelectionForTask(task) {
     if (!task) return 0;
     
-    console.log('📦 resolveSprintSelectionForTask called for task:', task.id, 'type:', typeof task.id);
-    console.log('📦 pendingAssignment:', window.__pendingSprintIdForTask);
     
     // Check for pending sprint assignment from inline sprint creation
     var pendingAssignment = window.__pendingSprintIdForTask;
@@ -887,10 +676,8 @@ function resolveSprintSelectionForTask(task) {
         // Compare as strings to handle type mismatches (temp IDs are numbers, server IDs might be strings)
         var pendingTaskId = String(pendingAssignment.taskId);
         var currentTaskId = String(task.id);
-        console.log('📦 Comparing taskIds - pending:', pendingTaskId, 'current:', currentTaskId, 'match:', pendingTaskId === currentTaskId);
         
         if (pendingTaskId === currentTaskId) {
-            console.log('📦 resolveSprintSelectionForTask - using pending sprint:', pendingAssignment.sprintId);
             // Apply to task and clear pending
             task.sprint_id = pendingAssignment.sprintId;
             task.parent = pendingAssignment.sprintId;
@@ -900,17 +687,14 @@ function resolveSprintSelectionForTask(task) {
     }
     
     if (task.sprint_id) {
-        console.log('📦 resolveSprintSelectionForTask - using task.sprint_id:', task.sprint_id);
         return parseInt(task.sprint_id, 10) || 0;
     }
     if (task.parent && typeof gantt !== 'undefined' && gantt.isTaskExists(task.parent)) {
         var parentTask = gantt.getTask(task.parent);
         if (isSprintTask(parentTask)) {
-            console.log('📦 resolveSprintSelectionForTask - using parent sprint:', parentTask.id);
             return parentTask.id;
         }
     }
-    console.log('📦 resolveSprintSelectionForTask - no sprint found, returning 0');
     return 0;
 }
 
@@ -932,7 +716,6 @@ window.workloadStatusMap = {};
 // Fetch project members (users and groups) for assignment dropdowns
 function fetchProjectMembers(projectId) {
     var url = '?controller=TaskGanttController&action=getProjectMembers&plugin=DhtmlGantt&project_id=' + projectId;
-    console.log('Fetching project members from:', url);
     
     fetch(url, {
         method: 'GET',
@@ -941,14 +724,11 @@ function fetchProjectMembers(projectId) {
         }
     })
     .then(function(response) {
-        console.log('Fetch response status:', response.status);
         return response.text(); // Get text first to debug
     })
     .then(function(text) {
-        console.log('Response text:', text.substring(0, 500));
         var data = JSON.parse(text);
         if (data.result === 'ok') {
-            console.log('Project members loaded:', data);
             window.projectUsers = data.users;
             window.projectCategories = data.groups;  // Backend returns categories in 'groups' key
             
@@ -985,11 +765,9 @@ function updateLightboxAssignmentOptions() {
         }
     }
     
-    console.log('Lightbox assignment options updated - Categories:', window.projectCategories.length, 'Users:', window.projectUsers.length);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, checking for DHtmlX Gantt container...');
     
     // Get the container element
     var container = document.getElementById('dhtmlx-gantt-chart');
@@ -1017,7 +795,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     
-    console.log('Gantt container found, initializing DHtmlX Gantt...');
     
     // Initialize DHtmlX Gantt
     var initialized = initDhtmlxGantt();
@@ -1034,8 +811,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // try {
     //     if (taskDataString) {
     //         taskData = JSON.parse(taskDataString);
-    //         console.log('Task data loaded from attribute:', taskData);
-    //         console.log('Task count:', taskData && taskData.data ? taskData.data.length : 'No data structure');
     //     }
     // } catch (e) {
     //     console.error('Failed to parse task data:', e);
@@ -1054,8 +829,6 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
         if (taskDataString) {
             taskData = JSON.parse(taskDataString);
-            console.log('Task data loaded from attribute:', taskData);
-            console.log('Task count:', taskData && taskData.data ? taskData.data.length : 'No data structure');
         } else {
             console.warn('No data-tasks attribute found');
         }
@@ -1094,6 +867,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+// ===== KB_Init_Core: Base gantt config, templates, and lightbox layout =====
 function initDhtmlxGantt() {
     // Check if DHtmlX Gantt library is loaded
     if (typeof gantt === 'undefined') {
@@ -1108,7 +882,6 @@ function initDhtmlxGantt() {
         return false;
     }
     
-    console.log('Initializing DHtmlX Gantt...', container);
     
     // Configure DHtmlX Gantt with NEW scale configuration format
     gantt.config.date_format = "%Y-%m-%d %H:%i";
@@ -1118,14 +891,12 @@ function initDhtmlxGantt() {
     // ✅ Apply saved zoom level from localStorage (if available)
     if (currentZoomLevel >= 0 && zoomLevels[currentZoomLevel]) {
         gantt.config.scales = zoomLevels[currentZoomLevel].scales;
-        console.log('📌 Applied saved zoom level on init:', zoomLevels[currentZoomLevel].name);
     } else {
         // Default to day view (level 1)
     gantt.config.scales = [
         {unit: "week", step: 1, format: "Week #%W"},
         {unit: "day", step: 1, format: "%d %M"}
     ];
-        console.log('Using default zoom level: day view');
     }
     
     // Ensure grid is visible
@@ -1152,7 +923,6 @@ function initDhtmlxGantt() {
         milestone: "milestone"
     };
     
-    console.log('✅ Gantt configured (GPL version - manual dependency movement)');
 
 
 
@@ -1211,7 +981,7 @@ function initDhtmlxGantt() {
         return task.text;
     };
     
-    // Display assignee name on the right side of task bar
+    // ===== KB_Name_Display: Assignee name on right side of task bar =====
     gantt.templates.rightside_text = function(start, end, task) {
         if (task.assignee) {
             return task.assignee;
@@ -1220,17 +990,81 @@ function initDhtmlxGantt() {
     };
     
     // Update tooltip to show category and assignee information
+    // (originally lived in Assets/gantt.js as a separate extension)
     gantt.templates.tooltip_text = function(start, end, task) {
         var assigneeLabel = task.assignee || 'Unassigned';
         var categoryLabel = task.group || 'No Category';  // task.group contains category name
+        var html = "";
         
-        return "<b>Task:</b> " + task.text + "<br/>" +
-               "<b>Category:</b> <span style='font-weight:bold;'>" + categoryLabel + "</span><br/>" +
-               "<b>Assigned to:</b> " + assigneeLabel + "<br/>" +
-               "<b>Start:</b> " + gantt.templates.tooltip_date_format(start) + "<br/>" +
-               "<b>End:</b> " + gantt.templates.tooltip_date_format(end) + "<br/>" +
-               "<b>Progress:</b> " + Math.round(task.progress * 100) + "%";
+        html += "<b>Task:</b> " + task.text + "<br/>";
+        html += "<b>Category:</b> <span style='font-weight:bold;'>" + categoryLabel + "</span><br/>";
+        html += "<b>Assigned to:</b> " + assigneeLabel + "<br/>";
+        html += "<b>Start:</b> " + gantt.templates.tooltip_date_format(start) + "<br/>";
+        html += "<b>End:</b> " + gantt.templates.tooltip_date_format(end) + "<br/>";
+        html += "<b>Progress:</b> " + Math.round(task.progress * 100) + "%";
+        
+        // Preserve the \"View in Kanboard\" link behavior from Assets/gantt.js
+        if (task.link) {
+            html += "<br/><a href='" + task.link + "' target='_blank'>View in Kanboard</a>";
+        }
+        
+        return html;
     };
+    
+    // ===== KB_Interactive_Schedule: Generic DHTMLX extensions (context menu, shortcuts) =====
+    
+    // Enhanced context menu: add \"View in Kanboard\" item when a task has a link
+    if (gantt.ext && gantt.ext.contextmenu) {
+        gantt.ext.contextmenu.attachEvent("onBeforeShow", function(id, point) {
+            var task = gantt.getTask(id);
+            var items = gantt.ext.contextmenu.getItems();
+            
+            if (task && task.link) {
+                items.push({
+                    text: "View in Kanboard",
+                    id: "view_kanboard",
+                    href: task.link,
+                    target: "_blank"
+                });
+            }
+            
+            return true;
+        });
+    }
+    
+    // Keyboard shortcuts for common operations (Ctrl/Cmd + N/S/Z/Y)
+    document.addEventListener('keydown', function(e) {
+        if (!e.ctrlKey && !e.metaKey) {
+            return;
+        }
+        
+        switch (e.key) {
+            case 'n':
+                e.preventDefault();
+                gantt.createTask();
+                break;
+            case 's':
+                e.preventDefault();
+                // Save all changes (if auto-save is disabled) - informational message
+                if (typeof gantt.message === 'function') {
+                    gantt.message("Changes saved automatically");
+                }
+                break;
+            case 'z':
+                if (gantt.ext && gantt.ext.undo) {
+                    e.preventDefault();
+                    gantt.ext.undo.undo();
+                }
+                break;
+            case 'y':
+                if (gantt.ext && gantt.ext.undo) {
+                    e.preventDefault();
+                    gantt.ext.undo.redo();
+                }
+                break;
+        }
+    });
+    
     //new
 
 
@@ -1275,7 +1109,6 @@ gantt.attachEvent("onBeforeLightbox", function(id) {
                     (typeof id === 'number' && id < 0) ||
                     !task.id || task.id === id; // DHtmlX uses $ prefix or negative IDs for new tasks
     
-    console.log('onBeforeLightbox for task:', id, 'isNewTask:', isNewTask, 'owner_id:', task.owner_id);
     
     // Set default priority to "normal" if not already set
     if (!task.priority) {
@@ -1322,15 +1155,12 @@ gantt.attachEvent("onBeforeLightbox", function(id) {
         if (lightbox) {
             if (isNewTask) {
                 lightbox.classList.add('gantt-new-task');
-                console.log('Added gantt-new-task class for new task');
             } else {
                 lightbox.classList.remove('gantt-new-task');
-                console.log('Removed gantt-new-task class for existing task');
             }
         }
     }, 0); // Use 0 delay for immediate execution
     
-    console.log('After processing, task_type:', task.task_type, 'owner_id:', task.owner_id, 'child_tasks:', task.child_tasks);
     
     return true;
 });
@@ -1343,7 +1173,6 @@ var lightboxObserver = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
         mutation.addedNodes.forEach(function(node) {
             if (node.nodeType === 1 && node.classList && node.classList.contains('gantt_cal_light')) {
-                console.log('Lightbox detected!');
 
                 // Immediately set milestone/sprint classes before delayed setup to avoid flash
                 try {
@@ -1403,11 +1232,9 @@ function setupLightboxFieldToggle(retryCount) {
     }
     
     if (!lightbox) {
-        console.log('Lightbox not found after retries');
         return;
     }
     
-    console.log('Lightbox found, looking for type select...');
     
     var taskId = gantt.getSelectedId();
     var task = taskId ? gantt.getTask(taskId) : null;
@@ -1423,12 +1250,10 @@ function setupLightboxFieldToggle(retryCount) {
         return;
     }
     
-    console.log('Type select found!');
     
     // Check if we need to force 'task' type (returning from inline sprint creation)
     var forceTaskType = window.__forceTaskTypeOnNextLightbox === true;
     if (forceTaskType) {
-        console.log('Forcing task type to "task" (returning from inline sprint creation)');
         window.__forceTaskTypeOnNextLightbox = false;
         
         // Also update the task object to be consistent
@@ -1463,7 +1288,6 @@ function setupLightboxFieldToggle(retryCount) {
         console.warn('Type option not found, defaulting to "task"');
         newTypeSelect.value = 'task';
     }
-    console.log('Set type select to', newTypeSelect.value, 'for task:', taskId);
     
     typeSelect.parentNode.replaceChild(newTypeSelect, typeSelect);
     typeSelect = newTypeSelect;
@@ -1475,7 +1299,6 @@ function setupLightboxFieldToggle(retryCount) {
         var isSprint = currentValue === 'sprint' || (task && (task.task_type === 'sprint' || task.type === 'project'));
         var isRegularTask = !isMilestone && !isSprint;
         
-        console.log('Toggling fields, isMilestone:', isMilestone, 'isSprint:', isSprint, 'value:', typeSelect.value, 'type:', typeof typeSelect.value);
         
         // Scope to the lightbox markup
         var lightbox = document.querySelector('.gantt_cal_light');
@@ -1503,9 +1326,7 @@ function setupLightboxFieldToggle(retryCount) {
             var prLabel = prContent && prContent.previousElementSibling && prContent.previousElementSibling.classList && prContent.previousElementSibling.classList.contains('gantt_cal_lsection') ? prContent.previousElementSibling : null;
             if (prContent) prContent.style.display = isMilestone ? 'none' : '';
             if (prLabel) prLabel.style.display = isMilestone ? 'none' : '';
-            console.log('Priority section hidden:', isMilestone, 'content:', !!prContent, 'label:', !!prLabel);
         } else {
-            console.log('Priority select not found');
         }
         
         // Hide/show Assign To section for sprints (sprints don't need assignees)
@@ -1522,7 +1343,6 @@ function setupLightboxFieldToggle(retryCount) {
                     task.owner_id = 0;
                 }
             }
-            console.log('Assignee section hidden:', isSprint, 'content:', !!assigneeContent, 'label:', !!assigneeLabel);
         }
 
         // Hide/show duration section for milestones (hide entire duration bar)
@@ -1534,7 +1354,6 @@ function setupLightboxFieldToggle(retryCount) {
              .gantt_time .gantt_duration_value,\
              .gantt_duration_end_date'
         );
-        console.log('Duration elements found:', durationCandidates.length);
         durationCandidates.forEach(function(inp){
             if (inp && inp.style) inp.style.display = isMilestone ? 'none' : '';
             var wrap = inp.closest('.gantt_duration, .gantt_duration_line, .gantt_time_duration, .gantt_duration_end_date');
@@ -1574,7 +1393,6 @@ function setupLightboxFieldToggle(retryCount) {
     
     // Apply on change
     typeSelect.addEventListener('change', function() {
-        console.log('Type changed to:', typeSelect.value);
         if (task) {
             var newTypeValue = typeSelect.value || 'task';
             task.task_type = newTypeValue;
@@ -1603,27 +1421,23 @@ function setupCascadingAssignmentDropdowns(retryCount) {
     }
     
     if (!lightbox) {
-        console.log('Lightbox not found for cascading dropdowns');
         return;
     }
     
     // Wait for data to be loaded
     if ((!window.projectUsers || window.projectUsers.length === 0) && retryCount < 20) {
-        console.log('Waiting for project members data... retry', retryCount);
         setTimeout(function() {
             setupCascadingAssignmentDropdowns(retryCount + 1);
         }, 100);
         return;
     }
     
-    console.log('Setting up lightbox dropdowns with', window.projectUsers.length, 'users and', window.projectCategories.length, 'categories');
     
     var taskId = gantt.getSelectedId();
     var categorySelect = lightbox.querySelector('select[title="category"]');
     var assigneeSelect = lightbox.querySelector('select[title="assignee"]');
     
     if (!categorySelect || !assigneeSelect) {
-        console.log('Category or assignee select not found:', {category: !!categorySelect, assignee: !!assigneeSelect});
         if (retryCount < 20) {
             setTimeout(function() {
                 setupCascadingAssignmentDropdowns(retryCount + 1);
@@ -1632,11 +1446,9 @@ function setupCascadingAssignmentDropdowns(retryCount) {
         return;
     }
     
-    console.log('Cascading dropdowns found!');
     
     // Manually populate the dropdowns since DHtmlX might not have done it yet
     if (categorySelect.options.length === 0 && window.projectCategories.length > 0) {
-        console.log('Manually populating category dropdown');
         // Add "No Category" option first
         var noCatOption = document.createElement('option');
         noCatOption.value = 0;
@@ -1652,7 +1464,6 @@ function setupCascadingAssignmentDropdowns(retryCount) {
     }
     
     if (assigneeSelect.options.length === 0 && window.projectUsers.length > 0) {
-        console.log('Manually populating assignee dropdown');
         window.projectUsers.forEach(function(user) {
             var option = document.createElement('option');
             option.value = user.key;
@@ -1680,13 +1491,11 @@ function setupCascadingAssignmentDropdowns(retryCount) {
     
     // Function to filter assignee dropdown based on selected category (REMOVED - categories don't have members)
     // Categories are independent of users, so no cascading logic needed
-    console.log('✅ Lightbox dropdowns populated successfully');
     
     /*
     // OLD CODE - kept for reference but disabled
     var filterAssignees = function() {
         var selectedGroupId = parseInt(categorySelect.value) || 0;
-        console.log('Group changed to:', selectedGroupId);
         
         // Get members of the selected group
         var allowedMembers = window.groupMemberMap[selectedGroupId] || [];
@@ -1696,7 +1505,6 @@ function setupCascadingAssignmentDropdowns(retryCount) {
             allowedMembers = window.projectUsers.map(function(u) { return u.key; });
         }
         
-        console.log('Allowed members:', allowedMembers);
         
         // Clear and repopulate assignee dropdown
         assigneeSelect.innerHTML = '';
@@ -1719,7 +1527,6 @@ function setupCascadingAssignmentDropdowns(retryCount) {
             assigneeSelect.value = 0;
         }
         
-        console.log('Assignee dropdown updated, selected:', assigneeSelect.value);
     };
     
     // Set initial group based on task's assignee
@@ -1737,8 +1544,6 @@ function setupCascadingAssignmentDropdowns(retryCount) {
 
 // Handle task save with sprint validation
 // gantt.attachEvent("onLightboxSave", function(id, task, is_new) {
-//     console.log('Lightbox save, task:', task);
-//     console.log('Task type:', task.task_type, 'owner_id:', task.owner_id, 'child_tasks:', task.child_tasks);
     
 //     // Ensure owner_id is properly set (convert string to integer if needed)
 //     if (task.owner_id !== undefined && task.owner_id !== null) {
@@ -1764,31 +1569,24 @@ function setupCascadingAssignmentDropdowns(retryCount) {
 //         task.type = "project"; // DHtmlX displays this as a parent bar
 //         task.color = "#9b59b6"; // Purple color for sprints
 //         task.is_milestone = false;
-//         console.log('Set Sprint with purple color');
 //     } else if (task.task_type === 'milestone') {
 //         task.type = "task";
 //         task.color = "#27ae60"; // Green for milestones
 //         task.is_milestone = true;
-//         console.log('Set Milestone with green color');
 //     } else {
 //         task.type = "task";
 //         task.is_milestone = false;
-//         console.log('Set regular Task');
 //     }
     
 //     return true; // Allow saving
 // });
 // Handle task save with sprint validation
 gantt.attachEvent("onLightboxSave", function(id, task, is_new) {
-    console.log('Lightbox save, task:', task);
-    console.log('Task type:', task.task_type, 'owner_id:', task.owner_id, 'child_tasks:', task.child_tasks);
-    console.log('🔥 is_new (from DHTMLX):', is_new, 'task.id:', id);
     
     // If this is an existing task (ID is a real server ID, not temporary),
     // and DHTMLX thinks it's new, we need to force it to be treated as an update
     var isRealServerId = id && typeof id === 'number' && id < 1700000000000;
     if (is_new && isRealServerId) {
-        console.log('🔥 Forcing existing task', id, 'to be treated as UPDATE, not CREATE');
         // Mark this task as needing explicit update save
         window.__forceUpdateTaskId = id;
     }
@@ -1796,7 +1594,6 @@ gantt.attachEvent("onLightboxSave", function(id, task, is_new) {
       var typeSection = gantt.getLightboxSection("type");
       if (typeSection && typeSection.getValue) {
           task.task_type = typeSection.getValue();
-          console.log("🔥 Saving task_type =", task.task_type);
       }
       
     // --- ✨ FIX: Retrieve sprint child task selections before validation ---
@@ -1804,7 +1601,6 @@ gantt.attachEvent("onLightboxSave", function(id, task, is_new) {
         var section = gantt.getLightboxSection("tasks");
         if (section && section.getValue) {
             task.child_tasks = section.getValue(); 
-            console.log("🔥 Final child_tasks to save:", task.child_tasks);
         }
     }
 
@@ -1821,13 +1617,11 @@ gantt.attachEvent("onLightboxSave", function(id, task, is_new) {
         var selectedSprintId = parseInt(sprintSelect.value, 10);
         if (!isNaN(selectedSprintId)) {
             task.sprint_id = selectedSprintId;
-            console.log('🔥 Sprint ID from DOM select:', task.sprint_id);
             
             // Also update the Gantt's internal task store to ensure persistence
             if (gantt.isTaskExists(id)) {
                 var ganttTask = gantt.getTask(id);
                 ganttTask.sprint_id = selectedSprintId;
-                console.log('🔥 Also updated Gantt internal task sprint_id to:', selectedSprintId);
             }
         }
     }
@@ -1835,7 +1629,6 @@ gantt.attachEvent("onLightboxSave", function(id, task, is_new) {
     if (task.sprint_id === undefined || task.sprint_id === null) {
         task.sprint_id = 0;
     }
-    console.log('🔥 Final sprint_id for task', id, ':', task.sprint_id);
 
     // Validation: Only regular tasks must be assigned
     if (task.task_type === 'task' && (!task.owner_id || task.owner_id === 0)) {
@@ -1849,25 +1642,18 @@ gantt.attachEvent("onLightboxSave", function(id, task, is_new) {
         task.type = "project";
         task.color = "#9b59b6"; // Purple
         task.is_milestone = false;
-        console.log('Set Sprint with purple color');
     } else if (task.task_type === 'milestone') {
         task.type = "task";
         task.color = "#27ae60"; // Green
         task.is_milestone = true;
-        console.log('Set Milestone with green color');
     } else {
         task.type = "task";
         task.is_milestone = false;
         task.color = getCategoryColorHex(task.category_id);
-        console.log('Set regular Task with color', task.color);
     }
     
     // Check if this is an inline sprint being saved
-    console.log('🔍 Checking inline sprint flow:', window.__inlineSprintFlow, 'current id:', id, 'type:', typeof id);
     if (window.__inlineSprintFlow) {
-        console.log('🔍 sprintTempId:', window.__inlineSprintFlow.sprintTempId, 'type:', typeof window.__inlineSprintFlow.sprintTempId);
-        console.log('🔍 Strict match:', window.__inlineSprintFlow.sprintTempId === id);
-        console.log('🔍 String match:', String(window.__inlineSprintFlow.sprintTempId) === String(id));
     }
     
     // Use string comparison to handle type mismatches
@@ -1876,7 +1662,6 @@ gantt.attachEvent("onLightboxSave", function(id, task, is_new) {
                          String(window.__inlineSprintFlow.sprintTempId) === String(id);
     
     if (isInlineSprint) {
-        console.log('✅ Inline sprint is being saved, marking as saved and will send to server');
         window.__inlineSprintFlow.sprintSaved = true;
         
         // Store a local reference to the flow for the async callback
@@ -1916,14 +1701,6 @@ gantt.attachEvent("onLightboxSave", function(id, task, is_new) {
             console.warn('Error reading lightbox sections for inline sprint:', e);
         }
         
-        console.log('📦 Inline sprint data to save:', {
-            text: sprintText,
-            owner_id: sprintOwnerId,
-            category_id: sprintCategoryId,
-            priority: sprintPriority,
-            child_tasks: sprintChildTasks
-        });
-        
         // Send the sprint to the server now (since we skipped it in onAfterTaskAdd)
         var formattedStartDate = gantt.date.date_to_str(gantt.config.date_format)(task.start_date);
         var formattedEndDate = gantt.date.date_to_str(gantt.config.date_format)(task.end_date);
@@ -1951,7 +1728,6 @@ gantt.attachEvent("onLightboxSave", function(id, task, is_new) {
         })
         .then(function(response) { return response.json(); })
         .then(function(data) {
-            console.log('Inline sprint server response:', data);
             if (data.result === 'ok' && data.id) {
                 var newSprintId = data.id;
                 
@@ -1973,25 +1749,19 @@ gantt.attachEvent("onLightboxSave", function(id, task, is_new) {
                     refreshSprintSectionOptions();
                 }
                 
-                console.log('✅ Inline sprint created successfully with ID:', newSprintId);
                 
                 // Check if the original task was assigned to this sprint during creation
                 var originalTaskWasAssigned = false;
-                console.log('📦 Checking assignment - returnTaskId:', returnTaskId, 'type:', typeof returnTaskId);
-                console.log('📦 sprintChildTasks:', sprintChildTasks, 'length:', sprintChildTasks ? sprintChildTasks.length : 0);
                 
                 if (returnTaskId && sprintChildTasks && sprintChildTasks.length > 0) {
                     var returnTaskIdNum = parseInt(returnTaskId, 10);
-                    console.log('📦 returnTaskIdNum:', returnTaskIdNum);
                     sprintChildTasks.forEach(function(childId, idx) {
-                        console.log('📦 Child ' + idx + ': ' + childId + ' (parsed: ' + parseInt(childId, 10) + ') match: ' + (parseInt(childId, 10) === returnTaskIdNum));
                     });
                     originalTaskWasAssigned = sprintChildTasks.some(function(childId) {
                         return parseInt(childId, 10) === returnTaskIdNum;
                     });
                 }
                 
-                console.log('📦 Original task ' + returnTaskId + ' was assigned to sprint: ' + originalTaskWasAssigned);
                 
                 // Store the new sprint ID for the original task (only if it was assigned)
                 if (originalTaskWasAssigned) {
@@ -2000,14 +1770,12 @@ gantt.attachEvent("onLightboxSave", function(id, task, is_new) {
                         sprintId: newSprintId,
                         sprintName: sprintText
                     };
-                    console.log('📦 Stored pending sprint assignment:', window.__pendingSprintIdForTask);
                 } else {
                     // Still store as a "recently created sprint" so user can easily select it
                     window.__recentlyCreatedSprint = {
                         sprintId: newSprintId,
                         sprintName: sprintText
                     };
-                    console.log('📦 Stored recently created sprint (not auto-assigned):', window.__recentlyCreatedSprint);
                 }
                 
                 // Mark that async sprint creation is complete
@@ -2016,7 +1784,6 @@ gantt.attachEvent("onLightboxSave", function(id, task, is_new) {
                 // If lightbox is already open for the original task, update the sprint dropdown
                 var lightbox = document.querySelector('.gantt_cal_light');
                 if (lightbox && returnTaskId) {
-                    console.log('📦 Lightbox is open, refreshing sprint dropdown with new sprint');
                     var sprintSelect = lightbox.querySelector('select[title="sprint"]');
                     if (sprintSelect) {
                         // Add the new sprint option if not already there
@@ -2127,7 +1894,6 @@ gantt.form_blocks["template"] = {
                             isAssignedToOtherSprint = true;
                         } else {
                             // Sprint was deleted, this task is available
-                            console.log('Task', t.id, 'was assigned to deleted sprint', taskSprintId, '- now available');
                         }
                     } else if (taskParentId > 0 && taskParentId !== currentTaskId) {
                         // Check if parent is a sprint that still exists
@@ -2138,7 +1904,6 @@ gantt.form_blocks["template"] = {
                             }
                         } else {
                             // Parent sprint was deleted, this task is available
-                            console.log('Task', t.id, 'parent sprint', taskParentId, 'was deleted - now available');
                         }
                     }
                     
@@ -2360,7 +2125,6 @@ gantt.form_blocks["template"] = {
     try {
         gantt.init("dhtmlx-gantt-chart");
 
-        console.log('DHtmlX Gantt initialized successfully');
         
         // ========== FIX ARROW HEADS WITH JAVASCRIPT ==========
         // Force all arrow elements to use CSS triangles instead of dots/icons
@@ -2374,36 +2138,35 @@ gantt.form_blocks["template"] = {
                 var isDarkMode = document.body.classList.contains('gantt-dark-mode');
                 var arrowColor = isDarkMode ? '#ffffff' : '#4a8f43';
                 
-                // Force triangle styling
-                arrow.style.width = '0';
-                arrow.style.height = '0';
-                arrow.style.fontSize = '0';
-                arrow.style.lineHeight = '0';
-                arrow.style.background = 'transparent';
-                arrow.style.backgroundColor = 'transparent';
-                arrow.style.color = 'transparent';
-                arrow.style.borderStyle = 'solid';
+                // Force triangle styling with !important to override CSS rules
+                arrow.style.setProperty('width', '0', 'important');
+                arrow.style.setProperty('height', '0', 'important');
+                arrow.style.setProperty('font-size', '0', 'important');
+                arrow.style.setProperty('line-height', '0', 'important');
+                arrow.style.setProperty('background', 'transparent', 'important');
+                arrow.style.setProperty('background-color', 'transparent', 'important');
+                arrow.style.setProperty('color', 'transparent', 'important');
+                arrow.style.setProperty('border-style', 'solid', 'important');
                 
-                // Determine arrow direction and apply correct border
+                // Determine arrow direction and apply correct border with !important
                 if (arrow.classList.contains('gantt_link_arrow_right')) {
-                    arrow.style.borderWidth = '7px 0 7px 10px';
-                    arrow.style.borderColor = 'transparent transparent transparent ' + arrowColor;
+                    arrow.style.setProperty('border-width', '7px 0 7px 10px', 'important');
+                    arrow.style.setProperty('border-color', 'transparent transparent transparent ' + arrowColor, 'important');
                 } else if (arrow.classList.contains('gantt_link_arrow_left')) {
-                    arrow.style.borderWidth = '7px 10px 7px 0';
-                    arrow.style.borderColor = 'transparent ' + arrowColor + ' transparent transparent';
+                    arrow.style.setProperty('border-width', '7px 10px 7px 0', 'important');
+                    arrow.style.setProperty('border-color', 'transparent ' + arrowColor + ' transparent transparent', 'important');
                 } else if (arrow.classList.contains('gantt_link_arrow_down')) {
-                    arrow.style.borderWidth = '10px 7px 0 7px';
-                    arrow.style.borderColor = arrowColor + ' transparent transparent transparent';
+                    arrow.style.setProperty('border-width', '10px 7px 0 7px', 'important');
+                    arrow.style.setProperty('border-color', arrowColor + ' transparent transparent transparent', 'important');
                 } else if (arrow.classList.contains('gantt_link_arrow_up')) {
-                    arrow.style.borderWidth = '0 7px 10px 7px';
-                    arrow.style.borderColor = 'transparent transparent ' + arrowColor + ' transparent';
+                    arrow.style.setProperty('border-width', '0 7px 10px 7px', 'important');
+                    arrow.style.setProperty('border-color', 'transparent transparent ' + arrowColor + ' transparent', 'important');
                 } else {
                     // Default to right arrow
-                    arrow.style.borderWidth = '7px 0 7px 10px';
-                    arrow.style.borderColor = 'transparent transparent transparent ' + arrowColor;
+                    arrow.style.setProperty('border-width', '7px 0 7px 10px', 'important');
+                    arrow.style.setProperty('border-color', 'transparent transparent transparent ' + arrowColor, 'important');
                 }
             });
-            console.log('🔧 Fixed', document.querySelectorAll('.gantt_link_arrow').length, 'arrow heads (dark mode:', document.body.classList.contains('gantt-dark-mode') + ')');
         }
 
         // Run on initial load
@@ -2437,10 +2200,8 @@ gantt.form_blocks["template"] = {
         var linksArea = document.querySelector('.gantt_links_area');
         if (linksArea) {
             observer.observe(linksArea, { childList: true, subtree: true });
-            console.log('✅ Arrow observer initialized');
         }
         
-        console.log('✅ Arrow fix initialized');
         
         // ✅ RESPONSIVE BEHAVIOR: Handle window resize
         var resizeTimeout;
@@ -2448,7 +2209,6 @@ gantt.form_blocks["template"] = {
             // Debounce resize events to avoid performance issues
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(function() {
-                console.log('Window resized, updating Gantt chart dimensions...');
                 // Force DHTMLX to recalculate dimensions
                 gantt.setSizes();
                 gantt.render();
@@ -2515,10 +2275,8 @@ function setupMoveDependenciesToggle() {
             });
         }
         
-        console.log('🔄 Move dependencies toggled:', moveDependenciesEnabled);
     });
     
-    console.log('✅ Move dependencies toggle initialized - Default: OFF, Current:', moveDependenciesEnabled);
 }
 
 /**
@@ -2560,10 +2318,8 @@ function setupShowProgressToggle() {
             });
         }
         
-        console.log('🔄 Show progress toggled:', showProgress);
     });
     
-    console.log('✅ Show progress toggle initialized - Default: ON, Current:', showProgress);
 }
 
 /**
@@ -2583,17 +2339,14 @@ function setupManualDependencyMovement() {
             start: new Date(task.start_date),
             end: new Date(task.end_date)
         };
-        console.log('📍 Drag started for task:', id, task.text);
         return true;
     });
     
     // Move dependent tasks after drag completes
     gantt.attachEvent("onAfterTaskDrag", function(id, mode, e) {
-        console.log('📍 Drag ended for task:', id, 'Mode:', mode, 'Toggle:', moveDependenciesEnabled, 'IsMoving:', isMovingDependencies);
         
         // Prevent re-entrant calls when we're already moving dependencies
         if (isMovingDependencies) {
-            console.log('⚠️ Already moving dependencies, skipping');
             return;
         }
         
@@ -2610,12 +2363,10 @@ function setupManualDependencyMovement() {
         var timeDiff = newStart - originalStart;
         
         if (timeDiff === 0) {
-            console.log('⚪ No movement detected');
             delete taskOriginalDates[id];
             return;
         }
         
-        console.log('🔄 Task moved by:', timeDiff, 'ms (', timeDiff / (1000 * 60 * 60 * 24), 'days)');
         
         // Set flag to prevent re-entrant calls
         isMovingDependencies = true;
@@ -2627,20 +2378,17 @@ function setupManualDependencyMovement() {
         isMovingDependencies = false;
         
         if (movedTasks.length > 0) {
-            console.log('✅ Moved', movedTasks.length, 'dependent task(s):', movedTasks);
             gantt.message({
                 text: '✅ Moved ' + movedTasks.length + ' dependent task(s)',
                 type: 'info',
                 expire: 2000
             });
         } else {
-            console.log('⚪ No dependent tasks to move');
         }
         
         delete taskOriginalDates[id];
     });
     
-    console.log('✅ Manual dependency movement initialized');
 }
 
 /**
@@ -2696,10 +2444,6 @@ function moveSuccessorTasks(taskId, timeDiff) {
             gantt.refreshTask(taskId);
             
             movedTasks.push(taskId);
-            console.log('  ↳ Moved task:', taskId, task.text, 
-                'from', original.start.toDateString(), 
-                'to', newStart.toDateString(),
-                '(' + (timeDiff / (1000 * 60 * 60 * 24)).toFixed(1) + ' days)');
         }
     }
     
@@ -2712,7 +2456,6 @@ function moveSuccessorTasks(taskId, timeDiff) {
 }
 
 function loadGanttData(data) {
-    console.log('Loading Gantt data...', data);
     
     // Handle both old and new data formats
     var tasks, links, resources;
@@ -2721,19 +2464,16 @@ function loadGanttData(data) {
         tasks = data.data;
         links = data.links || [];
         resources = data.resources || [];
-        console.log('Using data.data format, tasks:', tasks.length, 'resources:', resources.length);
         gantt.parse({data: tasks, links: links});
     } else if (Array.isArray(data)) {
         tasks = data;
         links = [];
         resources = [];
-        console.log('Using array format, tasks:', tasks.length);
         gantt.parse({data: tasks, links: []});
     } else {
         tasks = [];
         links = [];
         resources = [];
-        console.log('No valid data, creating empty gantt');
         gantt.parse({data: [], links: []});
     }
     
@@ -2788,8 +2528,7 @@ function handleCreateSprintShortcut() {
     }
 }
 
-// Function to populate custom workload panel
-// Function to calculate workload status for all assignees
+// ===== KB_Workload_Busyness: Calculate workload status per assignee =====
 function calculateWorkloadStatus(tasks) {
     var workloadMap = {};
     
@@ -2835,12 +2574,13 @@ function calculateWorkloadStatus(tasks) {
     return workloadMap;
 }
 
-// Function to get workload class for a specific task
+// ===== KB_Workload_Busyness: Get CSS class for task border =====
 function getWorkloadClassForTask(task) {
     if (!task || !task.owner_id) return '';
     return window.workloadStatusMap[task.owner_id] || '';
 }
 
+// ===== KB_Workload_Busyness: Update workload panel display =====
 function updateWorkloadPanel(tasks, resources) {
     var workloadContent = document.getElementById('workload-content');
     if (!workloadContent) return;
@@ -2900,7 +2640,6 @@ function updateWorkloadPanel(tasks, resources) {
 // ✅ Restore saved zoom level from localStorage (survives page reloads)
 var savedZoomLevel = localStorage.getItem('ganttZoomLevel');
 var currentZoomLevel = savedZoomLevel !== null ? parseInt(savedZoomLevel, 10) : 1; // Default to day view (level 1)
-console.log('📌 Initializing with zoom level:', currentZoomLevel, '(from localStorage:', savedZoomLevel, ')');
 
 var zoomLevels = [
     { name: "hour", scales: [{unit: "day", format: "%d %M"}, {unit: "hour", format: "%H"}] },
@@ -2909,6 +2648,7 @@ var zoomLevels = [
     { name: "month", scales: [{unit: "year", format: "%Y"}, {unit: "month", format: "%M"}] }
 ];
 
+// ===== KB_Zoom_And_Views: Smart zoom in/out =====
 function smartZoom(direction) {
     var newLevel = direction === 'in' ? 
         Math.max(0, currentZoomLevel - 1) : 
@@ -2916,7 +2656,6 @@ function smartZoom(direction) {
     
     if (newLevel === currentZoomLevel) return;
     
-    console.log('🔎 Zooming', direction, '- Level:', currentZoomLevel, '→', newLevel);
     
     // Save center date to maintain position
     var scrollState = gantt.getScrollState();
@@ -2933,7 +2672,6 @@ function smartZoom(direction) {
     // ✅ Clear view mode from localStorage (zoom buttons override view mode buttons)
     localStorage.removeItem('ganttViewMode');
     
-    console.log('✅ Zoom applied:', zoomLevels[newLevel].name, '- currentZoomLevel:', currentZoomLevel, '(saved to localStorage)');
     
     // Restore center position
     if (centerDate) {
@@ -2942,10 +2680,10 @@ function smartZoom(direction) {
     }
 }
 
+// ===== KB_Zoom_And_Views: Fit-to-screen auto zoom =====
 function smartFitToScreen() {
     var tasks = gantt.getTaskByTime();
     if (tasks.length === 0) {
-        console.log('No tasks to fit');
         return;
     }
     
@@ -2959,7 +2697,6 @@ function smartFitToScreen() {
     });
     
     if (!minDate || !maxDate) {
-        console.log('Could not determine date range');
         return;
     }
     
@@ -2988,13 +2725,6 @@ function smartFitToScreen() {
     } else {
         level = 3; // Month view
     }
-    
-    console.log('🎯 Fit to Screen:', {
-        tasks: tasks.length,
-        dateRange: totalDays.toFixed(1) + ' days',
-        pixelsPerDay: pixelsPerDay.toFixed(2),
-        zoomLevel: zoomLevels[level].name
-    });
     
     // Apply zoom level
     gantt.config.scales = zoomLevels[level].scales;
@@ -3032,7 +2762,6 @@ function recalcParentDuration(childTask) {
     // ✅ ONLY adjust duration for SPRINTS, not regular parent tasks
     var isSprint = parent.task_type === 'sprint' || parent.type === 'project';
     if (!isSprint) {
-        console.log('⏭️ Skipping duration adjustment for non-sprint parent:', parent.text);
         return;
     }
 
@@ -3064,10 +2793,6 @@ function recalcParentDuration(childTask) {
     }
 
     if (changed) {
-        console.log('🧮 Sprint duration recalculated:', parent.text, {
-            newStart: parent.start_date,
-            newEnd: parent.end_date
-        });
         gantt.refreshTask(parentId);
         gantt.updateTask(parentId);
     }
@@ -3078,7 +2803,6 @@ function recalcParentDuration(childTask) {
  * Only adjusts sprints, not regular parent tasks
  */
 function recalcAllParentDurations() {
-    console.log('🔄 Running initial sprint duration recalculation...');
     gantt.eachTask(function(task) {
         if (task.parent) {
             var parent = gantt.getTask(task.parent);
@@ -3089,13 +2813,11 @@ function recalcAllParentDurations() {
         }
     });
     gantt.render();
-    console.log('✅ Sprint durations synced after load');
 }
 
 function setupGanttEventHandlers() {
     // Bind once guard
     if (window.__ganttHandlersBound) {
-        console.log('[Gantt] handlers already bound — skipping');
         return;
     }
     window.__ganttHandlersBound = true;
@@ -3112,7 +2834,6 @@ function setupGanttEventHandlers() {
     }
     // Data processor for CRUD operations - URLs will be set by template
     if (typeof window.ganttUrls !== 'undefined' && window.ganttUrls.update) {
-        console.log('Setting up data processor with URLs:', window.ganttUrls);
         
         // Use simplified event-based approach instead of data processor
         // ---- same-level rule helpers ----
@@ -3126,30 +2847,54 @@ function setupGanttEventHandlers() {
         return (pa === 0 && pb === 0) || (pa !== 0 && pa === pb);
     }
     
+    // ===== KB_Task_Dependencies: Link validation (same-level, circular, sprint rules) =====
+    
+    // Check for circular dependency (A→B and B→A)
+    function _isCircularLink(link) {
+        var links = gantt.getLinks();
+        for (var i = 0; i < links.length; i++) {
+            var l = links[i];
+            if (String(l.source) === String(link.target) &&
+                String(l.target) === String(link.source)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     // dhtmlx built-in validator (runs before adding the link)
     gantt.attachEvent("onLinkValidation", function(link){
         const s = gantt.getTask(link.source);
         const t = gantt.getTask(link.target);
         
-        // ✅ FIX: Prevent sprints from being linked (source or target)
+        // Rule 1: Prevent sprints from being linked (source or target)
         if (s.task_type === 'sprint' || t.task_type === 'sprint') {
             singleToast("Sprints cannot be linked to other tasks");
             return false;
         }
         
+        // Rule 2: Same-level check
         const ok = _sameLevelAllowed(s, t);
-        if (!ok) singleToast("Rule: only siblings or top-level tasks can be linked.");
-        return ok;
+        if (!ok) {
+            singleToast("Rule: only siblings or top-level tasks can be linked.");
+            return false;
+        }
+        
+        // Rule 3: Circular dependency check
+        if (_isCircularLink(link)) {
+            singleToast("Circular dependency detected");
+            return false;
+        }
+        
+        return true;
       });
     
         // Handle task creation
         gantt.attachEvent("onAfterTaskAdd", function(id, task) {
-            console.log('New task created:', id, task);
             
             // Check if this is actually an existing task that DHTMLX mistakenly thinks is new
             // (This happens after the inline sprint flow)
             if (window.__forceUpdateTaskId === id) {
-                console.log('🔥 Redirecting existing task', id, 'to UPDATE endpoint instead of CREATE');
                 window.__forceUpdateTaskId = null;
                 
                 // Send to update endpoint instead
@@ -3177,7 +2922,6 @@ function setupGanttEventHandlers() {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('🔥 Forced update response:', data);
                 })
                 .catch(error => {
                     console.error('Error forcing update for task:', error);
@@ -3189,7 +2933,6 @@ function setupGanttEventHandlers() {
             // Check if this is an inline sprint creation in progress
             // If so, don't send to server yet - wait for user to save or cancel
             if (window.__inlineSprintFlow && window.__inlineSprintFlow.sprintTempId === id) {
-                console.log('Inline sprint creation detected, deferring server save until user confirms');
                 // Don't mark as successfully created yet - wait for actual save
                 // Don't send to server yet
                 return;
@@ -3218,7 +2961,6 @@ function setupGanttEventHandlers() {
             var isSubtask = parentTaskId && parentTaskId !== 0 && parentTaskId !== '0';
             
             if (isSubtask) {
-                console.log('🔗 Creating subtask with parent:', parentTaskId);
             }
             
             // Send create request to server including all fields
@@ -3226,7 +2968,6 @@ function setupGanttEventHandlers() {
             var formattedStartDate = gantt.date.date_to_str(gantt.config.date_format)(task.start_date);
             var formattedEndDate = gantt.date.date_to_str(gantt.config.date_format)(task.end_date);
             
-            console.log('Creating task with times:', formattedStartDate, '→', formattedEndDate);
             
             fetch(window.ganttUrls.create, {
                 method: 'POST',
@@ -3249,11 +2990,9 @@ function setupGanttEventHandlers() {
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Server response for new task:', data);
                 if (data.result === 'ok' && data.id) {
                     // Update the task ID in Gantt with the server-assigned ID
                     gantt.changeTaskId(id, data.id);
-                    console.log('Task ID updated from', id, 'to', data.id);
                     
                     if (task.task_type === 'sprint') {
                         window.projectSprints = window.projectSprints || [];
@@ -3278,7 +3017,6 @@ function setupGanttEventHandlers() {
                     
             // ✅ If this is a subtask, create the internal link "is a child of"
                     if (isSubtask) {
-                        console.log('🔗 Creating internal link: Task', data.id, 'is a child of', parentTaskId);
                         
                         fetch(window.ganttUrls.createLink, {
                             method: 'POST',
@@ -3291,7 +3029,6 @@ function setupGanttEventHandlers() {
                         })
                         .then(response => response.json())
                         .then(linkData => {
-                            console.log('✅ Internal link created successfully:', linkData);
                             if (linkData.result !== 'ok') {
                                 console.error('Failed to create internal link:', linkData.message);
                             }
@@ -3332,7 +3069,6 @@ function setupGanttEventHandlers() {
         var saveTimeout = null;
         
         gantt.attachEvent("onAfterTaskUpdate", function(id, task) {
-            console.log('Task updated:', id, task.text);
         
             // // If this is a parent task, do NOT allow it to be shorter than its children.
             // var childIds = gantt.getChildren(id);
@@ -3383,7 +3119,6 @@ function setupGanttEventHandlers() {
         
             // If this task has a parent, recalc that parent's span (unchanged behavior)
             if (task.parent) {
-                console.log('Refreshing parent after child update:', task.parent);
                 recalcParentDuration(task);
                 gantt.refreshTask(task.parent, true);
             }
@@ -3396,7 +3131,6 @@ function setupGanttEventHandlers() {
             }
             sprintIdToSave = parseInt(sprintIdToSave, 10) || 0;
             
-            console.log('📦 Queueing save for task', id, '- sprint_id:', sprintIdToSave, 'task.sprint_id:', task.sprint_id);
             
             tasksToSave[id] = {
                 id: id,
@@ -3426,12 +3160,10 @@ function setupGanttEventHandlers() {
         
         // Handle lightbox close (any way it closes)
         gantt.attachEvent("onAfterLightbox", function(closedTaskId) {
-            console.log('onAfterLightbox fired, closedTaskId:', closedTaskId, 'flow:', window.__inlineSprintFlow, 'starting:', window.__inlineSprintFlowStarting);
             
             // Skip if we're in the middle of starting the inline sprint flow
             // (hideLightbox triggers this before we create the sprint task)
             if (window.__inlineSprintFlowStarting) {
-                console.log('Skipping finalization - inline sprint flow is still starting');
                 return true;
             }
             
@@ -3444,7 +3176,6 @@ function setupGanttEventHandlers() {
                 var wasSuccessfullyCreated = successfullyCreatedTaskIds[closedTaskId];
                 
                 if (isNewTask && !wasSuccessfullyCreated && gantt.isTaskExists(closedTaskId)) {
-                    console.log('Removing unsaved new task from chart (closed without saving):', closedTaskId);
                     // Use setTimeout to avoid issues with Gantt's internal state
                     setTimeout(function() {
                         if (gantt.isTaskExists(closedTaskId)) {
@@ -3461,11 +3192,9 @@ function setupGanttEventHandlers() {
 
         // Handle cancel button specifically
         gantt.attachEvent("onLightboxCancel", function(taskId) {
-            console.log('onLightboxCancel fired, taskId:', taskId, 'flow:', window.__inlineSprintFlow, 'starting:', window.__inlineSprintFlowStarting);
             
             // Skip if we're in the middle of starting the inline sprint flow
             if (window.__inlineSprintFlowStarting) {
-                console.log('Skipping cancel handling - inline sprint flow is still starting');
                 return true;
             }
             
@@ -3495,7 +3224,6 @@ function setupGanttEventHandlers() {
         function saveQueuedTasks() {
             if (Object.keys(tasksToSave).length === 0) return;
             
-            console.log('💾 Saving queued tasks:', Object.keys(tasksToSave));
             
             // Collect all save promises
             var savePromises = [];
@@ -3503,7 +3231,6 @@ function setupGanttEventHandlers() {
             // Save each task
             for (var taskId in tasksToSave) {
                 var taskData = tasksToSave[taskId];
-                console.log('📤 Sending to server - Task ID:', taskId, 'sprint_id:', taskData.sprint_id, 'Full data:', JSON.stringify(taskData));
                 
                 var savePromise = fetch(window.ganttUrls.update, {
                     method: 'POST',
@@ -3533,13 +3260,11 @@ function setupGanttEventHandlers() {
             
             // ✅ After all saves complete, refresh the chart to show updated colors
             Promise.all(savePromises).then(function(results) {
-                console.log('All task saves completed');
                 var allSuccessful = results.every(function(r) { return r === true; });
                 
                 // DON'T auto-refresh if inline sprint flow is active
                 // (refreshing would destroy the temporary sprint task)
                 if (window.__inlineSprintFlow) {
-                    console.log('⏸️ Skipping auto-refresh - inline sprint flow is active');
                     updateWorkloadPanel(gantt.getTaskByTime(), []);
                     return;
                 }
@@ -3547,13 +3272,11 @@ function setupGanttEventHandlers() {
                 // DON'T auto-refresh if lightbox is open (would reset user's changes)
                 var lightboxOpen = document.querySelector('.gantt_cal_light');
                 if (lightboxOpen) {
-                    console.log('⏸️ Skipping auto-refresh - lightbox is open');
                     updateWorkloadPanel(gantt.getTaskByTime(), []);
                     return;
                 }
                 
                 if (allSuccessful) {
-                    console.log('🔄 Auto-refreshing chart to reflect changes...');
                     // Small delay to ensure backend has processed everything
                     setTimeout(function() {
                         reloadGanttDataFromServer();
@@ -3566,7 +3289,6 @@ function setupGanttEventHandlers() {
         
         // Handle task deletion
         gantt.attachEvent("onBeforeTaskDelete", function(id, task) {
-            console.log('Task deletion requested, sending to server:', id, task);
             
             // If this is a sprint being deleted, release all child tasks first
             var isSprintTask = task && (task.task_type === 'sprint' || task.type === 'project');
@@ -3576,7 +3298,6 @@ function setupGanttEventHandlers() {
             if (isSprintTask) {
                 // Get all children of this sprint BEFORE any deletion happens
                 var children = gantt.getChildren(id);
-                console.log('🗑️ Deleting sprint, releasing child tasks:', children);
                 
                 // First, collect all child data
                 children.forEach(function(childId) {
@@ -3599,7 +3320,6 @@ function setupGanttEventHandlers() {
                             assignee: childTask.assignee,
                             is_milestone: childTask.is_milestone
                         });
-                        console.log('🗑️ Saved child task data:', childId, childTask.text);
                     }
                 });
                 
@@ -3636,13 +3356,11 @@ function setupGanttEventHandlers() {
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Task deletion response:', data);
                 if (data.result !== 'ok') {
                     console.error('Failed to delete task:', data.message);
                 } else {
                     // Update the released child tasks on the server
                     if (childTaskIds.length > 0) {
-                        console.log('🗑️ Updating released tasks on server:', childTaskIds);
                         childTaskIds.forEach(function(childId) {
                             if (gantt.isTaskExists(childId)) {
                                 var childTask = gantt.getTask(childId);
@@ -3670,7 +3388,6 @@ function setupGanttEventHandlers() {
                                 })
                                 .then(function(r) { return r.json(); })
                                 .then(function(d) {
-                                    console.log('🗑️ Released task', childId, 'updated:', d);
                                 });
                             }
                         });
@@ -3692,17 +3409,14 @@ function setupGanttEventHandlers() {
         
         // Handle after task deletion - restore child tasks if they were removed
         gantt.attachEvent("onAfterTaskDelete", function(id, task) {
-            console.log('🗑️ Task deleted:', id);
             
             // Check if we have released child tasks to restore
             if (window.__releasedChildTasks && window.__releasedChildTasks.sprintId === id) {
                 var releasedData = window.__releasedChildTasks;
-                console.log('🗑️ Checking if child tasks need restoration:', releasedData.taskIds);
                 
                 // Check each child task - if it no longer exists, re-add it
                 releasedData.tasks.forEach(function(taskData) {
                     if (!gantt.isTaskExists(taskData.id)) {
-                        console.log('🗑️ Re-adding deleted child task:', taskData.id, taskData.text);
                         
                         // Re-add the task with parent = 0
                         gantt.addTask({
@@ -3748,12 +3462,9 @@ function setupGanttEventHandlers() {
             
             // Prevent infinite loop
             if (isProcessingLink) {
-                console.log('Skipping link creation - already processing');
                 return;
             }
             isProcessingLink = true;
-            console.log('Link created, sending to server:', id, link);
-            console.log('Using URL:', window.ganttUrls.createLink);
             
             // Send dependency to server using fetch API
             fetch(window.ganttUrls.createLink, {
@@ -3766,15 +3477,11 @@ function setupGanttEventHandlers() {
                 })
             })
             .then(response => {
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
                 return response.text(); // Get as text first to see what we're getting
             })
             .then(text => {
-                console.log('Raw response:', text);
                 try {
                     const data = JSON.parse(text);
-                    console.log('Dependency creation response:', data);
                     if (data.result !== 'ok') {
                         console.error('Failed to create dependency:', data.message);
                         // ⚠️ FIX: Remove link WITHOUT triggering events to prevent infinite loop
@@ -3785,7 +3492,6 @@ function setupGanttEventHandlers() {
                         return;
                     }
                     // ✅ SUCCESS: Reload fresh data from server to reflect changes
-                    console.log('Dependency created successfully - reloading fresh data from server...');
                     reloadGanttDataFromServer();
                     isProcessingLink = false; // Reset flag
                 } catch (parseError) {
@@ -3813,28 +3519,21 @@ function setupGanttEventHandlers() {
             
             // Prevent processing during link creation cleanup
             if (isProcessingLink) {
-                console.log('Skipping removal - link creation is being processed');
                 return;
             }
             
-            console.log('Link deleted, sending to server:');
-            console.log('  DHTMLX ID:', id);
-            console.log('  Link object:', link);
             
             // Use the actual database ID from the link object, not the DHTMLX internal ID
             var databaseId = link.id || id;
-            console.log('  Using database link ID:', databaseId, '(type:', typeof databaseId, ')');
             
             // Ensure we have a valid integer ID for the database
             var linkIdForServer = parseInt(databaseId, 10);
             
             // Check if this looks like a DHTMLX internal ID (very large number)
             if (isNaN(linkIdForServer) || linkIdForServer <= 0 || linkIdForServer > 1000000) {
-                console.log('Invalid or internal DHTMLX ID - skipping server request:', databaseId);
                 return; // Don't send request for internal IDs or invalid IDs
             }
             
-            console.log('  Sending link ID to server:', linkIdForServer);
             
             // Send removal request to server using fetch API
             fetch(window.ganttUrls.removeLink, {
@@ -3847,29 +3546,22 @@ function setupGanttEventHandlers() {
                 })
             })
             .then(response => {
-                console.log('Removal response status:', response.status);
                 return response.text(); // Get as text first to handle both JSON and HTML responses
             })
             .then(text => {
-                console.log('Raw removal response:', text);
                 try {
                     const data = JSON.parse(text);
-                    console.log('Dependency removal response:', data);
                     if (data.result === 'ok') {
-                        console.log('Dependency removed successfully from server');
                         
                         // ⚠️ FORCE REMOVAL: Sometimes DHTMLX doesn't remove the visual arrow properly
                         // So we need to force remove it and refresh the chart
-                        console.log('Force removing link from UI and refreshing...');
                         
                         // Try to remove the link from DHTMLX if it still exists
                         if (gantt.isLinkExists(linkIdForServer)) {
-                            console.log('Link still exists in DHTMLX, force removing...');
                             gantt.deleteLink(linkIdForServer);
                         }
                         
                         // ✅ DYNAMIC SOLUTION: Reload fresh data from server
-                        console.log('Dependency removed successfully - reloading fresh data from server...');
                         reloadGanttDataFromServer();
                         
                         return; // Exit early
@@ -3877,7 +3569,6 @@ function setupGanttEventHandlers() {
                         console.error('Failed to remove dependency:', data.message);
                         // ⚠️ FIX: Don't restore link - let the UI removal stand
                         // The link probably didn't exist in database anyway
-                        console.log('Server removal failed - keeping UI removal (link may not have existed in DB)');
                         return;
                     }
                 } catch (parseError) {
@@ -3886,18 +3577,15 @@ function setupGanttEventHandlers() {
                     
                     // ⚠️ FIX: Don't restore link on parse errors either  
                     // Most parse errors happen because the link wasn't in the database
-                    console.log('Parse error during removal - keeping UI removal (link likely not in DB)');
                     return; // Exit early, don't refresh
                 }
             })
             .catch(error => {
                 console.error('Error removing dependency:', error);
                 // ⚠️ FIX: Don't restore on network errors either
-                console.log('Network error during removal - keeping UI removal');
             });
         });
         
-        console.log('Event-based data handling initialized successfully');
         
     } else {
         console.warn('No ganttUrls found, data processor not initialized');
@@ -3910,14 +3598,12 @@ function setupGanttEventHandlers() {
  * Reloads fresh data from server to ensure chart is always in sync (NO PAGE RELOAD!)
  */
 function reloadGanttDataFromServer() {
-    console.log('🔄 Reloading Gantt data from server (FAST - no page reload)...');
     
     // ✅ Save current zoom level, column width, and scroll position before reload
     var savedZoomLevel = currentZoomLevel;
     var savedMinColumnWidth = gantt.config.min_column_width;
     var savedScrollState = gantt.getScrollState();
     
-    console.log('💾 Saved state - zoom:', savedZoomLevel, 'min_column_width:', savedMinColumnWidth);
     
     // ✅ Use dedicated JSON endpoint URL from data attribute
     var dataUrl = window.ganttUrls && window.ganttUrls.getData;
@@ -3928,7 +3614,6 @@ function reloadGanttDataFromServer() {
         return;
     }
     
-    console.log('📡 Fetching from:', dataUrl);
     
     // Make FAST JSON request (no HTML parsing needed!)
     fetch(dataUrl, {
@@ -3939,14 +3624,12 @@ function reloadGanttDataFromServer() {
         }
     })
     .then(response => {
-        console.log('✅ Response received, status:', response.status);
         if (!response.ok) {
             throw new Error('HTTP ' + response.status + ': ' + response.statusText);
         }
         return response.json();
     })
     .then(freshTaskData => {
-        console.log('✅ Got fresh task data from JSON endpoint:', freshTaskData);
         
         // Update cached data
         window.taskData = freshTaskData;
@@ -3959,13 +3642,11 @@ function reloadGanttDataFromServer() {
         if (typeof savedZoomLevel === 'number' && savedZoomLevel >= 0 && zoomLevels[savedZoomLevel]) {
             gantt.config.scales = zoomLevels[savedZoomLevel].scales;
             currentZoomLevel = savedZoomLevel;
-            console.log('✅ Restored zoom:', zoomLevels[savedZoomLevel].name);
         }
         
         // ✅ Restore min_column_width (critical for Month view)
         if (savedMinColumnWidth) {
             gantt.config.min_column_width = savedMinColumnWidth;
-            console.log('✅ Restored min_column_width:', savedMinColumnWidth);
         }
         
         gantt.render(); // Re-render with all saved settings
@@ -3974,11 +3655,9 @@ function reloadGanttDataFromServer() {
         setTimeout(function() {
             if (savedScrollState) {
                 gantt.scrollTo(savedScrollState.x, savedScrollState.y);
-                console.log('✅ Restored scroll position');
             }
         }, 100);
         
-        console.log('✅✅✅ FAST RELOAD COMPLETE - No page refresh! ✅✅✅');
     })
     .catch(error => {
         console.error('❌ Fast JSON reload failed:', error);
@@ -4054,18 +3733,15 @@ function fallbackRefresh() {
     if (groupByDropdown) {
         groupByDropdown.addEventListener('change', function() {
             var mode = this.value;
-            console.log('Group by changed to:', mode);
             
             // ✅ ALWAYS clear grouping first before applying new one
             // This ensures originalTasks is properly restored
             if (originalTasks) {
-                console.log('Clearing previous grouping before applying new one...');
                 clearGrouping();
             }
             
             if (mode === 'none') {
                 // Already cleared above, just keep it cleared
-                console.log('Group by: None (cleared)');
             } else if (mode === 'assignee') {
                 groupByAssignee();
             } else if (mode === 'group') {
@@ -4076,8 +3752,7 @@ function fallbackRefresh() {
         });
     }
     
-    
-    // ✅ Dark Mode toggle button
+    // ===== KB_DarkMode_Styling: Dark mode toggle button handler =====
     var darkModeToggleBtn = document.getElementById('dhtmlx-dark-mode-toggle');
     if (darkModeToggleBtn) {
         // Restore saved dark mode preference
@@ -4095,13 +3770,11 @@ function fallbackRefresh() {
                 document.body.classList.remove('gantt-dark-mode');
                 icon.className = 'fa fa-moon-o';
                 localStorage.setItem('ganttDarkMode', 'false');
-                console.log('☀️ Switched to light mode');
             } else {
                 // Switch to dark mode
                 document.body.classList.add('gantt-dark-mode');
                 icon.className = 'fa fa-sun-o';
                 localStorage.setItem('ganttDarkMode', 'true');
-                console.log('🌙 Switched to dark mode');
             }
             
             // Re-render gantt to apply styles
@@ -4131,7 +3804,6 @@ function fallbackRefresh() {
                 this.setAttribute('title', 'Collapse All');
                 icon.className = 'fa fa-compress';
                 
-                console.log('🔽 Expanded all tasks');
             } else {
                 // Collapse all tasks
                 gantt.eachTask(function(task) {
@@ -4144,7 +3816,6 @@ function fallbackRefresh() {
                 this.setAttribute('title', 'Expand All');
                 icon.className = 'fa fa-expand';
                 
-                console.log('🔼 Collapsed all tasks');
             }
         });
     }
@@ -4152,13 +3823,11 @@ function fallbackRefresh() {
     // View mode buttons - add delay to ensure DOM is ready
     setTimeout(function() {
         const viewButtons = document.querySelectorAll('.btn-dhtmlx-view');
-        console.log('Found view buttons:', viewButtons.length);
         
         viewButtons.forEach(function(btn) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 const view = this.getAttribute('data-view');
-                console.log('View mode button clicked:', view);
                 
                 // Remove active class from all buttons
                 document.querySelectorAll('.btn-dhtmlx-view').forEach(function(b) {
@@ -4178,7 +3847,6 @@ function fallbackRefresh() {
         var savedViewMode = localStorage.getItem('ganttViewMode');
         
         if (!savedZoomFromStorage && savedViewMode) {
-            console.log('📌 Restoring saved view mode from localStorage:', savedViewMode);
             changeViewMode(savedViewMode);
             // Mark the correct button as active
             viewButtons.forEach(function(btn) {
@@ -4189,7 +3857,6 @@ function fallbackRefresh() {
                 }
             });
         } else if (savedZoomFromStorage) {
-            console.log('📌 Zoom level found in localStorage, skipping view mode restoration');
         }
     }, 100);
     
@@ -4253,13 +3920,11 @@ function fallbackRefresh() {
             gantt.config.auto_scheduling = moveDepsToggle.checked;
             gantt.config.auto_scheduling_strict = moveDepsToggle.checked;
             gantt.config.auto_scheduling_compatibility = moveDepsToggle.checked;
-            console.log('✅ Move dependencies toggle initialized:', moveDepsToggle.checked);
         }
         
         if (showProgressToggle) {
             showProgressToggle.checked = savedProgress !== 'false'; // Default true
             gantt.config.show_progress = showProgressToggle.checked;
-            console.log('✅ Show progress toggle initialized:', showProgressToggle.checked);
         }
         
         if (showBusynessToggle) {
@@ -4272,7 +3937,6 @@ function fallbackRefresh() {
                     ganttContainer.classList.add('hide-busyness-borders');
                 }
             }
-            console.log('✅ Show busyness toggle initialized:', showBusynessToggle.checked);
         }
         
         // Handle Move Dependencies toggle
@@ -4282,7 +3946,6 @@ function fallbackRefresh() {
                 gantt.config.auto_scheduling_strict = this.checked;
                 gantt.config.auto_scheduling_compatibility = this.checked;
                 localStorage.setItem('ganttMoveDependencies', this.checked);
-                console.log('Move dependencies:', this.checked ? 'ON' : 'OFF');
             });
         }
         
@@ -4292,7 +3955,6 @@ function fallbackRefresh() {
                 gantt.config.show_progress = this.checked;
                 localStorage.setItem('ganttShowProgress', this.checked);
                 gantt.render();
-                console.log('Show progress bars:', this.checked ? 'ON' : 'OFF');
             });
         }
         
@@ -4308,7 +3970,6 @@ function fallbackRefresh() {
                     }
                     localStorage.setItem('ganttShowBusyness', this.checked);
                     gantt.render();
-                    console.log('Show busyness borders:', this.checked ? 'ON' : 'OFF');
                 }
             });
         }
@@ -4316,16 +3977,14 @@ function fallbackRefresh() {
 
 }
 
+// ===== KB_Zoom_And_Views: Day/Week/Month view mode =====
 function changeViewMode(mode) {
-    console.log('Changing view mode to:', mode);
-    
-    // ✅ Save view mode to localStorage so it survives page reloads
+    // Save view mode to localStorage so it survives page reloads
     localStorage.setItem('ganttViewMode', mode);
     
     // ✅ Clear zoom level from localStorage (view mode buttons override zoom buttons)
     localStorage.removeItem('ganttZoomLevel');
     currentZoomLevel = 1; // Reset to default
-    console.log('🔄 Cleared zoom level (view mode buttons override zoom)');
     
     // Use NEW scale configuration format
     switch(mode) {
@@ -4352,7 +4011,6 @@ function changeViewMode(mode) {
             break;
     }
     gantt.render();
-    console.log('View mode changed to:', mode, '(saved to localStorage) - Gantt re-rendered');
 }
 
 
@@ -4360,8 +4018,8 @@ function changeViewMode(mode) {
 //new
 var originalTasks = null; // Store original task data
 
+// ===== KB_Grouping_Assignee: Group tasks by assignee =====
 function groupByAssignee() {
-    console.log('Grouping by assignee...');
     
     // Store original tasks if not already stored
     if (!originalTasks) {
@@ -4450,12 +4108,10 @@ function groupByAssignee() {
     gantt.clearAll();
     gantt.parse({data: groupedData, links: []});
     
-    console.log('Grouped by assignee successfully');
 }
 
+// ===== KB_Grouping_Category: Group tasks by category (user group) =====
 function groupByUserGroup() {
-    console.log('Grouping by user group...');
-    
     // Store original tasks if not already stored
     if (!originalTasks) {
         originalTasks = gantt.serialize();
@@ -4543,12 +4199,10 @@ function groupByUserGroup() {
     gantt.clearAll();
     gantt.parse({data: groupedData, links: []});
     
-    console.log('Grouped by user group successfully');
 }
 
+// ===== KB_Grouping_Sprint: Group tasks by sprint =====
 function groupBySprint() {
-    console.log('Grouping by sprint...');
-    
     // Store original tasks if not already stored
     if (!originalTasks) {
         originalTasks = gantt.serialize();
@@ -4556,79 +4210,110 @@ function groupBySprint() {
     
     // Get all tasks
     var tasks = gantt.getTaskByTime();
-    var sprints = {};
+    var sprintTasks = {};  // Map of sprint_id to sprint task
+    var childTasksBySprintId = {}; // Map of sprint_id to child tasks
+    var orphanTasks = []; // Tasks without a sprint
     var groupedData = [];
-    var groupIdCounter = 10000; // Start group IDs at a high number to avoid conflicts
     
-    // Group tasks by sprint metadata
+    // First pass: identify sprint tasks and group children
     tasks.forEach(function(task) {
-        var sprintName = task.sprint || 'No Sprint';
-        if (!sprints[sprintName]) {
-            sprints[sprintName] = {
-                id: groupIdCounter++,
-                text: sprintName,
-                start_date: task.start_date,
-                duration: 0,
-                progress: 0,
-                type: 'project', // Make it a project/group
-                open: true,
-                sprint: sprintName,
-                tasks: []
-            };
+        // Check if this task IS a sprint
+        if (task.task_type === 'sprint') {
+            sprintTasks[task.id] = task;
+            if (!childTasksBySprintId[task.id]) {
+                childTasksBySprintId[task.id] = [];
+            }
         }
-        sprints[sprintName].tasks.push(task);
     });
     
-    // Build grouped structure
-    for (var sprintName in sprints) {
-        var sprint = sprints[sprintName];
-        var minDate = null;
-        var maxDate = null;
-        var totalProgress = 0;
+    // Second pass: assign tasks to their sprints
+    tasks.forEach(function(task) {
+        // Skip sprint tasks themselves
+        if (task.task_type === 'sprint') return;
         
-        // Calculate sprint properties
-        sprint.tasks.forEach(function(task) {
-            if (!minDate || task.start_date < minDate) {
-                minDate = task.start_date;
+        // Check if task belongs to a sprint via sprint_id
+        var sprintId = task.sprint_id || 0;
+        if (sprintId && sprintTasks[sprintId]) {
+            if (!childTasksBySprintId[sprintId]) {
+                childTasksBySprintId[sprintId] = [];
             }
-            var taskEnd = task.end_date || gantt.calculateEndDate(task.start_date, task.duration);
-            if (!maxDate || taskEnd > maxDate) {
-                maxDate = taskEnd;
+            childTasksBySprintId[sprintId].push(task);
+        } else if (task.parent && sprintTasks[task.parent]) {
+            // Check if parent is a sprint
+            if (!childTasksBySprintId[task.parent]) {
+                childTasksBySprintId[task.parent] = [];
             }
-            totalProgress += task.progress;
-        });
-        
-        sprint.start_date = minDate;
-        sprint.end_date = maxDate;
-        sprint.duration = gantt.calculateDuration(minDate, maxDate);
-        sprint.progress = totalProgress / sprint.tasks.length;
+            childTasksBySprintId[task.parent].push(task);
+        } else {
+            // Task has no sprint
+            orphanTasks.push(task);
+        }
+    });
+    
+    // Build grouped structure - add sprints with their children
+    for (var sprintId in sprintTasks) {
+        var sprint = sprintTasks[sprintId];
+        var children = childTasksBySprintId[sprintId] || [];
         
         // Add sprint header
         groupedData.push({
             id: sprint.id,
-            text: sprint.text + ' (' + sprint.tasks.length + ' tasks)',
+            text: sprint.text + ' (' + children.length + ' tasks)',
             start_date: gantt.date.date_to_str(gantt.config.date_format)(sprint.start_date),
+            end_date: sprint.end_date ? gantt.date.date_to_str(gantt.config.date_format)(sprint.end_date) : null,
             duration: sprint.duration,
-            progress: sprint.progress,
+            progress: sprint.progress || 0,
             type: 'project',
             open: true,
-            parent: 0,  // ✅ Explicitly set parent to 0 to avoid cycles
-            color: '#9b59b6' // Purple color for sprints
+            parent: 0,
+            color: '#9b59b6',
+            task_type: 'sprint'
         });
         
-        // Add tasks under sprint
-        sprint.tasks.forEach(function(task) {
+        // Add child tasks under sprint
+        children.forEach(function(task) {
             groupedData.push({
                 id: task.id,
                 text: task.text,
                 start_date: gantt.date.date_to_str(gantt.config.date_format)(task.start_date),
-                end_date: gantt.date.date_to_str(gantt.config.date_format)(task.end_date || gantt.calculateEndDate(task.start_date, task.duration)),
+                end_date: task.end_date ? gantt.date.date_to_str(gantt.config.date_format)(task.end_date) : null,
                 duration: task.duration,
                 progress: task.progress,
                 priority: task.priority,
                 color: task.color,
-                parent: sprint.id, // Set parent to sprint
-                sprint: task.sprint
+                parent: sprint.id,
+                task_type: task.task_type
+            });
+        });
+    }
+    
+    // Add orphan tasks under "No Sprint" group if there are any
+    if (orphanTasks.length > 0) {
+        var noSprintGroupId = 99999;
+        groupedData.push({
+            id: noSprintGroupId,
+            text: 'No Sprint (' + orphanTasks.length + ' tasks)',
+            start_date: gantt.date.date_to_str(gantt.config.date_format)(orphanTasks[0].start_date),
+            duration: 1,
+            progress: 0,
+            type: 'project',
+            open: true,
+            parent: 0,
+            color: '#95a5a6'
+        });
+        
+        orphanTasks.forEach(function(task) {
+            groupedData.push({
+                id: task.id,
+                text: task.text,
+                start_date: gantt.date.date_to_str(gantt.config.date_format)(task.start_date),
+                end_date: task.end_date ? gantt.date.date_to_str(gantt.config.date_format)(task.end_date) : null,
+                duration: task.duration,
+                progress: task.progress,
+                priority: task.priority,
+                color: task.color,
+                parent: noSprintGroupId,
+                task_type: task.task_type
             });
         });
     }
@@ -4636,12 +4321,9 @@ function groupBySprint() {
     // Clear and reload with grouped data
     gantt.clearAll();
     gantt.parse({data: groupedData, links: []});
-    
-    console.log('Grouped by sprint successfully');
 }
 
 function clearGrouping() {
-    console.log('Clearing grouping...');
     
     if (originalTasks) {
         gantt.clearAll();
@@ -4649,22 +4331,13 @@ function clearGrouping() {
         originalTasks = null;
     }
     
-    console.log('Grouping cleared');
 }
-//new
-
-// Statistics function removed - no longer displayed
-
-// ---------------------------
-// Group-by initialization
-// ---------------------------
+// ===== KB_Grouping_Assignee / KB_Grouping_Category / KB_Grouping_Sprint: Initial grouping =====
 function applyInitialGrouping() {
     if (typeof gantt === 'undefined' || !gantt.groupBy) return;
   
     var container = document.getElementById('dhtmlx-gantt-chart');
     var mode = (container && container.getAttribute('data-group-by')) || 'none';
-  
-    console.log('[Grouping] Applying initial mode:', mode);
   
     if (mode === 'none') {
       gantt.groupBy(false); // clear grouping
@@ -4674,5 +4347,75 @@ function applyInitialGrouping() {
         default_group_label: '—'
       });
     }
-  }
-  
+}
+
+// ===== KB_Utilities: General-purpose helpers (highlight, stats, auto-refresh) =====
+window.KanboardGantt = {
+    /**
+     * Highlight tasks matching a criteria function
+     * @param {Function} criteria - function(task) returning true to highlight
+     */
+    highlightTasks: function(criteria) {
+        gantt.eachTask(function(task) {
+            var element = gantt.getTaskNode(task.id);
+            if (element) {
+                if (criteria(task)) {
+                    element.classList.add('dhtmlx-highlighted');
+                } else {
+                    element.classList.remove('dhtmlx-highlighted');
+                }
+            }
+        });
+    },
+    
+    /**
+     * Get project statistics (total, completed, in-progress, not-started, overdue)
+     * @returns {Object} stats object
+     */
+    getProjectStats: function() {
+        var stats = {
+            total: 0,
+            completed: 0,
+            inProgress: 0,
+            notStarted: 0,
+            overdue: 0
+        };
+        
+        var now = new Date();
+        
+        gantt.eachTask(function(task) {
+            stats.total++;
+            
+            if (task.progress >= 1) {
+                stats.completed++;
+            } else if (task.progress > 0) {
+                stats.inProgress++;
+            } else {
+                stats.notStarted++;
+            }
+            
+            if (task.end_date && new Date(task.end_date) < now && task.progress < 1) {
+                stats.overdue++;
+            }
+        });
+        
+        return stats;
+    },
+    
+    /**
+     * Setup periodic auto-refresh from server
+     * @param {number} intervalMinutes - refresh interval in minutes (0 to disable)
+     */
+    setupAutoRefresh: function(intervalMinutes) {
+        if (intervalMinutes > 0) {
+            setInterval(function() {
+                if (typeof reloadGanttDataFromServer === 'function') {
+                    reloadGanttDataFromServer();
+                } else {
+                    gantt.clearAll();
+                    gantt.load(window.location.href);
+                }
+            }, intervalMinutes * 60000);
+        }
+    }
+};

@@ -1,3 +1,31 @@
+<?php
+/**
+ * Task Gantt main template
+ *
+ * KB_Init_Core
+ *   - Renders the project header and injects the main Gantt container
+ *     with all required data attributes for `dhtmlx-init.js`.
+ *
+ * KB_Zoom_And_Views
+ *   - Provides the Day/Week/Month view buttons that JS hooks onto.
+ *
+ * KB_Workload_Busyness
+ *   - Contains the markup for the workload panel displayed alongside
+ *     the chart.
+ *
+ * KB_DarkMode_Styling
+ *   - Hosts legend and toolbar markup whose appearance is adjusted by
+ *     CSS in `gantt-theme.css` / `gantt-overrides.css`.
+ *
+ * KB_Interactive_Schedule
+ *   - Toolbar buttons and settings dropdown that connect to toggles
+ *     in the JS (move dependencies, show progress, busyness borders).
+ *
+ * See KB_COMMENT_TABLE.md for a full description of the KB_* tags
+ * used across this plugin.
+ */
+?>
+
 <section id="main" style="display: flex; flex-direction: column; height: 100%;">
     <?= $this->projectHeader->render($project, 'TaskGanttController', 'show', false, 'DhtmlGantt') ?>
 

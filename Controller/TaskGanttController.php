@@ -9,12 +9,32 @@ use Kanboard\Model\TaskModel;
 /**
  * Tasks Gantt Controller
  *
+ * KB_Backend_Controller
+ *   - Handles all HTTP endpoints for the task-level Gantt: initial
+ *     page render, JSON data feed (`getData`), saves, creates, and
+ *     dependency add/remove actions.
+ *
+ * KB_Sprints_Logic
+ *   - Persists sprint metadata, sprint child relationships, and sprint
+ *     progress back into Kanboard.
+ *
+ * KB_Task_Types
+ *   - Ensures task_type and is_milestone metadata are saved alongside
+ *     the main task record.
+ *
+ * KB_Task_Dependencies
+ *   - Server-side parts of dependency management (link add/remove).
+ *
+ * See KB_COMMENT_TABLE.md for a full description of the KB_* tags used
+ * across this plugin.
+ *
  * @package  Kanboard\Plugin\DhtmlGantt\Controller
  * @author   Your Development Team
  * @property \Kanboard\Plugin\DhtmlGantt\Formatter\TaskGanttFormatter $taskGanttFormatter
  */
 class TaskGanttController extends BaseController
 {
+    // ===== KB_Backend_Controller: Main Gantt view endpoint =====
     /**
      * Show Gantt chart for one project
      */
@@ -77,8 +97,9 @@ class TaskGanttController extends BaseController
         ));
     }
 
+    // ===== KB_Backend_Controller: JSON endpoint for fast AJAX refresh =====
     /**
-     * ✅ NEW: Get task data as JSON (for fast AJAX refresh without page reload)
+     * Get task data as JSON (for fast AJAX refresh without page reload)
      */
     public function getData()
     {
@@ -119,6 +140,7 @@ class TaskGanttController extends BaseController
     }
 
 
+    // ===== KB_Backend_Controller / KB_Task_Types: Save task updates =====
     /**
      * Save task updates (title, dates, priority, etc.)
      */
@@ -129,7 +151,6 @@ class TaskGanttController extends BaseController
         $values = [];
         
         // Debug logging
-        error_log('DHtmlX Gantt Save - Received data: ' . json_encode($changes));
 
         $task_id = (int) $changes['id'];
         $values['id'] = $task_id;
@@ -181,27 +202,23 @@ class TaskGanttController extends BaseController
         // Update assignee (owner_id)
         if (isset($changes['owner_id'])) {
             $values['owner_id'] = (int) $changes['owner_id'];
-            error_log('DHtmlX Gantt Save - Setting owner_id to: ' . $values['owner_id']);
         }
         
         // Handle milestone status
         if (isset($changes['is_milestone'])) {
             $isMilestone = $changes['is_milestone'] ? '1' : '0';
-            error_log('DHtmlX Gantt Save - Setting milestone status to: ' . $isMilestone);
             $this->taskMetadataModel->save($task_id, array('is_milestone' => $isMilestone));
         }
         
         // ✅ Handle task_type (task, milestone, sprint)
         if (isset($changes['task_type']) && $changes['task_type'] !== '') {
             $currentTaskType = $changes['task_type'];
-            error_log('DHtmlX Gantt Save - Setting task_type to: ' . $currentTaskType);
             $this->taskMetadataModel->save($task_id, array('task_type' => $currentTaskType));
         }
         
         // ✅ FIX: Handle category_id updates
         if (isset($changes['category_id'])) {
             $values['category_id'] = (int) $changes['category_id'];
-            error_log('DHtmlX Gantt Save - Setting category_id to: ' . $values['category_id']);
         }
         
         // ✅ FIX: Only handle sprint child_tasks if task is ALREADY a sprint
@@ -211,24 +228,19 @@ class TaskGanttController extends BaseController
         if ($hasChildTasksPayload && $currentTaskType === 'sprint') {
             $newChildIds = is_array($changes['child_tasks']) ? $changes['child_tasks'] : array();
             $newChildIds = array_values(array_unique(array_map('intval', $newChildIds)));
-            error_log('DHtmlX Gantt Save - Updating sprint child tasks for task ' . $task_id . ': ' . json_encode($newChildIds));
             
             // Get existing child task IDs
             $existingChildIds = $this->getExistingChildIds($task_id);
-            error_log('DHtmlX Gantt Save - Existing child tasks: ' . json_encode($existingChildIds));
             
             // Determine which links to add and remove
             $toAdd = array_diff($newChildIds, $existingChildIds);
             $toRemove = array_diff($existingChildIds, $newChildIds);
             
-            error_log('DHtmlX Gantt Save - Links to add: ' . json_encode($toAdd));
-            error_log('DHtmlX Gantt Save - Links to remove: ' . json_encode($toRemove));
             
             // Get the link ID for "is a parent of"
             $linkId = $this->getLinkIdByLabel('is a parent of');
             
             if (!$linkId) {
-                error_log('DHtmlX Gantt Save - Error: "is a parent of" link type not found');
             } else {
                 // Remove old links
                 foreach ($toRemove as $childId) {
@@ -238,7 +250,6 @@ class TaskGanttController extends BaseController
                 // Add new links
                 foreach ($toAdd as $childId) {
                     $this->taskLinkModel->create($task_id, (int)$childId, $linkId);
-                    error_log('DHtmlX Gantt Save - Created link: task ' . $task_id . ' is parent of task ' . $childId);
                 }
             }
         }
@@ -248,7 +259,6 @@ class TaskGanttController extends BaseController
             $progress = (float) $changes['progress'];
             // Convert 0-1 range to 0-100 for storage
             $progressPercent = round($progress * 100);
-            error_log('DHtmlX Gantt Save - Setting progress to: ' . $progressPercent . '%');
             $this->taskMetadataModel->save($task_id, array('gantt_progress' => $progressPercent));
         }
         
@@ -267,7 +277,6 @@ class TaskGanttController extends BaseController
         
         // Always try to update if we have values (at minimum we have the ID)
         if (count($values) > 1) {
-            error_log('DHtmlX Gantt Save - Updating task ' . $task_id . ' with values: ' . json_encode($values));
             
             $result = $this->taskModificationModel->update($values);
            
@@ -276,18 +285,16 @@ class TaskGanttController extends BaseController
             // }
 
             if (! $result) {
-                error_log('DHtmlX Gantt Save - Failed to update task ' . $task_id);
                 $this->response->json(array('result' => 'error', 'message' => 'Unable to save task'), 400);
             } else {
-                error_log('DHtmlX Gantt Save - Successfully updated task ' . $task_id);
                 $this->response->json(array('result' => 'ok', 'message' => 'Task updated successfully'), 200);
             }
         } else {
-            error_log('DHtmlX Gantt Save - No changes to save');
             $this->response->json(array('result' => 'ok', 'message' => 'No changes'), 200);
         }
     }
 
+    // ===== KB_Backend_Controller / KB_Sprints_Logic: Create new task =====
     /**
      * Create new task
      */
@@ -297,7 +304,6 @@ class TaskGanttController extends BaseController
         $data = $this->request->getJson();
         
         // Debug logging
-        error_log('DHtmlX Gantt Create - Received data: ' . json_encode($data));
 
         // Map priority from string to integer
         $priority = 0; // default to normal
@@ -328,7 +334,6 @@ class TaskGanttController extends BaseController
             // Save milestone status if provided
             if (isset($data['is_milestone'])) {
                 $isMilestone = $data['is_milestone'] ? '1' : '0';
-                error_log('DHtmlX Gantt Create - Setting milestone status to: ' . $isMilestone . ' for task: ' . $task_id);
                 $this->taskMetadataModel->save($task_id, array('is_milestone' => $isMilestone));
             }
 
@@ -352,22 +357,18 @@ class TaskGanttController extends BaseController
                     foreach ($childIds as $childId) {
                         if ($childId > 0) {
                             $this->taskLinkModel->create($task_id, $childId, $linkId);
-                            error_log('DHtmlX Gantt Create - Linked sprint ' . $task_id . ' as parent of task ' . $childId);
                         }
                     }
                 } else {
-                    error_log('DHtmlX Gantt Create - Warning: "is a parent of" link type not found when creating sprint.');
                 }
             }
             
-            error_log('DHtmlX Gantt Create - Task created successfully with ID: ' . $task_id);
             $this->response->json(array(
                 'result' => 'ok',
                 'id' => $task_id,
                 'message' => 'Task created successfully'
             ), 201);
         } else {
-            error_log('DHtmlX Gantt Create - Failed to create task');
             $this->response->json(array(
                 'result' => 'error',
                 'message' => 'Unable to create task'
@@ -385,17 +386,13 @@ class TaskGanttController extends BaseController
         $task_id = (int) ($data['id'] ?? 0);
         
         // Debug logging
-        error_log('DHtmlX Gantt Remove - Received data: ' . json_encode($data));
-        error_log('DHtmlX Gantt Remove - Task ID: ' . $task_id);
 
         if ($task_id && $this->taskModel->remove($task_id)) {
-            error_log('DHtmlX Gantt Remove - Task deleted successfully: ' . $task_id);
             $this->response->json(array(
                 'result' => 'ok',
                 'message' => 'Task deleted successfully'
             ), 200);
         } else {
-            error_log('DHtmlX Gantt Remove - Failed to delete task: ' . $task_id);
             $this->response->json(array(
                 'result' => 'error',
                 'message' => 'Unable to delete task'
@@ -409,24 +406,17 @@ class TaskGanttController extends BaseController
     public function dependency()
     {
         // Debug logging
-        error_log('DHtmlX Gantt - Dependency method called');
-        error_log('Request method: ' . $_SERVER['REQUEST_METHOD']);
-        error_log('Content type: ' . ($_SERVER['CONTENT_TYPE'] ?? 'not set'));
         
         try {
             $project = $this->getProject();
-            error_log('Project ID: ' . $project['id']);
             
             $data = $this->request->getJson();
-            error_log('Received data: ' . json_encode($data));
             
             if (empty($data['source']) || empty($data['target'])) {
-                error_log('Missing source or target task IDs');
                 $this->response->json(array('result' => 'error', 'message' => 'Missing task IDs'), 400);
                 return;
             }
         } catch (Exception $e) {
-            error_log('Error in dependency method: ' . $e->getMessage());
             $this->response->json(array('result' => 'error', 'message' => 'Server error: ' . $e->getMessage()), 500);
             return;
         }
@@ -434,20 +424,17 @@ class TaskGanttController extends BaseController
         try {
             $sourceTaskId = (int) $data['source'];
             $targetTaskId = (int) $data['target'];
-            error_log('Processing dependency: ' . $sourceTaskId . ' -> ' . $targetTaskId);
 
             // Validate that both tasks exist and belong to the current project
             $sourceTask = $this->taskFinderModel->getById($sourceTaskId);
             $targetTask = $this->taskFinderModel->getById($targetTaskId);
 
             if (!$sourceTask || !$targetTask) {
-                error_log('Task validation failed - source: ' . ($sourceTask ? 'found' : 'not found') . ', target: ' . ($targetTask ? 'found' : 'not found'));
                 $this->response->json(array('result' => 'error', 'message' => 'One or both tasks not found'), 404);
                 return;
             }
 
             if ($sourceTask['project_id'] != $project['id'] || $targetTask['project_id'] != $project['id']) {
-                error_log('Project validation failed - source project: ' . $sourceTask['project_id'] . ', target project: ' . $targetTask['project_id'] . ', expected: ' . $project['id']);
                 $this->response->json(array('result' => 'error', 'message' => 'Tasks must belong to the same project'), 403);
                 return;
             }
@@ -461,15 +448,12 @@ class TaskGanttController extends BaseController
             if ($linkType === 'child' || $linkType === '1') {
                 // Creating parent-child relationship: source is child of target
                 $linkLabel = 'is a child of';
-                error_log('Creating parent-child link: Task ' . $sourceTaskId . ' is a child of ' . $targetTaskId);
             } else {
                 // Creating dependency: source blocks target
                 $linkLabel = 'blocks';
-                error_log('Creating dependency link: Task ' . $sourceTaskId . ' blocks ' . $targetTaskId);
             }
             
             $linkId = $this->getLinkIdByLabel($linkLabel);
-            error_log('Link type "' . $linkLabel . '" ID: ' . ($linkId ? $linkId : 'not found'));
             
             if (!$linkId) {
                 $this->response->json(array('result' => 'error', 'message' => 'Link type "' . $linkLabel . '" not found'), 500);
@@ -478,14 +462,12 @@ class TaskGanttController extends BaseController
             
             // ✅ Check for circular dependencies ONLY for "blocks" relationships, NOT parent-child
             if ($linkLabel === 'blocks' && $this->wouldCreateCircularDependency($sourceTaskId, $targetTaskId)) {
-                error_log('Circular dependency detected for blocks relationship');
                 $this->response->json(array('result' => 'error', 'message' => 'Circular dependency detected'), 400);
                 return;
             }
 
             // Create link: TaskLinkModel::create() expects 3 separate arguments: (taskId, oppositeTaskId, linkId)
             $result = $this->taskLinkModel->create($sourceTaskId, $targetTaskId, $linkId);
-            error_log('Link creation result: ' . ($result ? 'success' : 'failed'));
 
             if ($result) {
                 $this->response->json(array('result' => 'ok', 'message' => 'Dependency created successfully'), 201);
@@ -493,36 +475,30 @@ class TaskGanttController extends BaseController
                 $this->response->json(array('result' => 'error', 'message' => 'Unable to create dependency'), 500);
             }
         } catch (Exception $e) {
-            error_log('Exception in dependency creation: ' . $e->getMessage());
-            error_log('Stack trace: ' . $e->getTraceAsString());
             $this->response->json(array('result' => 'error', 'message' => 'Server error: ' . $e->getMessage()), 500);
         }
     }
 
+    // ===== KB_Task_Dependencies: Remove task dependency =====
     /**
      * Remove task dependency
      */
     public function removeDependency()
     {
         // Debug logging
-        error_log('DHtmlX Gantt - removeDependency method called');
         
         try {
             $project = $this->getProject();
             $data = $this->request->getJson();
-            error_log('Remove dependency data: ' . json_encode($data));
             
             if (empty($data['id'])) {
-                error_log('Missing link ID for removal');
                 $this->response->json(array('result' => 'error', 'message' => 'Missing link ID'), 400);
                 return;
             }
 
             $linkId = (int) $data['id'];
-            error_log('Attempting to remove link ID: ' . $linkId);
             
             $result = $this->taskLinkModel->remove($linkId);
-            error_log('Removal result: ' . ($result ? 'success' : 'failed'));
             
             if ($result) {
                 $this->response->json(array('result' => 'ok', 'message' => 'Dependency removed successfully'), 200);
@@ -530,7 +506,6 @@ class TaskGanttController extends BaseController
                 $this->response->json(array('result' => 'error', 'message' => 'Unable to remove dependency'), 500);
             }
         } catch (Exception $e) {
-            error_log('Exception in removeDependency: ' . $e->getMessage());
             $this->response->json(array('result' => 'error', 'message' => 'Server error: ' . $e->getMessage()), 500);
         }
     }
@@ -558,7 +533,6 @@ class TaskGanttController extends BaseController
     //     $isSprint = isset($parentMetadata['task_type']) && $parentMetadata['task_type'] === 'sprint';
         
     //     if (!$isSprint) {
-    //         error_log('Skipping duration adjustment for non-sprint parent task: ' . $parentId);
     //         return;
     //     }
 
@@ -743,7 +717,6 @@ class TaskGanttController extends BaseController
                 ->remove();
         }
         
-        error_log('DHtmlX Gantt Save - Removed parent-child link between ' . $parentId . ' and ' . $childId);
     }
 
     private function assignTaskToSprint(int $taskId, int $newSprintId): void
@@ -769,7 +742,6 @@ class TaskGanttController extends BaseController
         $linkId = $this->getLinkIdByLabel('is a parent of');
         if ($linkId) {
             $this->taskLinkModel->create($newSprintId, $taskId, $linkId);
-            error_log('DHtmlX Gantt Save - Assigned task ' . $taskId . ' to sprint ' . $newSprintId);
         }
     }
 
@@ -819,6 +791,7 @@ class TaskGanttController extends BaseController
         return isset($metadata['task_type']) && $metadata['task_type'] === 'sprint';
     }
     
+    // ===== KB_Task_Dependencies: Add task dependency =====
     // POST /dhtmlxgantt/:project_id/dependency
     public function addDependency()
     {
@@ -980,11 +953,9 @@ class TaskGanttController extends BaseController
     {
         try {
             $project = $this->getProject();
-            error_log('DHtmlX Gantt - Getting members for project: ' . $project['id']);
             
             // Get users assigned to this project
             $projectUsers = $this->projectUserRoleModel->getUsers($project['id']);
-            error_log('DHtmlX Gantt - Found ' . count($projectUsers) . ' users assigned to project');
             
             $formattedUsers = array();
             
@@ -1028,9 +999,7 @@ class TaskGanttController extends BaseController
                 );
             }
             
-            error_log('DHtmlX Gantt - Found ' . count($categories) . ' categories in project');
             
-            error_log('DHtmlX Gantt - Returning data: ' . count($formattedUsers) . ' users, ' . count($formattedGroups) . ' groups');
             
             $this->response->json(array(
                 'result' => 'ok',
@@ -1038,8 +1007,6 @@ class TaskGanttController extends BaseController
                 'groups' => $formattedGroups
             ));
         } catch (\Exception $e) {
-            error_log('DHtmlX Gantt - Error in getProjectMembers: ' . $e->getMessage());
-            error_log('DHtmlX Gantt - Stack trace: ' . $e->getTraceAsString());
             $this->response->json(array(
                 'result' => 'error',
                 'message' => $e->getMessage()

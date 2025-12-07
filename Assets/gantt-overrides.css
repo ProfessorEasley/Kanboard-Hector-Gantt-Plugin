@@ -1,6 +1,19 @@
 /* 
- * CSP-compliant fixes for DHTMLX Gantt GPL
- * Replace icon fonts with simple text/symbols
+ * Kanboard DHtmlX Gantt Plugin - CSP & Hard Override Styles
+ *
+ * KB_CSP_And_Assets
+ *   - CSP-compliant replacements for icon fonts and other elements that
+ *     would otherwise rely on blocked webfonts.
+ *
+ * KB_DarkMode_Styling
+ *   - Last-layer arrow head styling and link visibility for dark mode.
+ *
+ * This file is intentionally loaded LAST (see Plugin.php) so that its
+ * rules can safely override both the vendor `dhtmlxgantt.css` and the
+ * main theme `gantt-theme.css` when needed.
+ *
+ * Replace icon fonts with simple text/symbols and enforce arrow head
+ * shapes that are resilient to theme overrides.
  */
 
 /* Force all gantt elements to use system fonts instead of icon fonts */
@@ -65,7 +78,8 @@
     font-size: 14px !important;
 }
 
-/* ============ COMPLETE ARROW OVERRIDE - HIGHEST PRIORITY ============ */
+/* ===== KB_Task_Dependencies: Dependency arrow head overrides ===== */
+/* COMPLETE ARROW OVERRIDE - HIGHEST PRIORITY */
 /* Completely hide and reset the :before pseudo-element that contains the icon */
 .gantt_task_link div.gantt_link_arrow::before,
 .gantt_task_link div.gantt_link_arrow:before,

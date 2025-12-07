@@ -75,19 +75,24 @@ class Plugin extends Base
         //
         // Assets (ensure correct load order)
         //
-        // 1) DHTMLX library first
+        // KB_CSP_And_Assets:
+        //   1) DHTMLX vendor library + CSS (dhtmlxgantt.js, dhtmlxgantt.css)
+        //   2) Our main JS integration (dhtmlx-init.js)
+        //   3) Our theme CSS (gantt-theme.css)
+        //   4) Final overrides CSS (gantt-overrides.css) — MUST load last
+        //
+        // 1) DHTMLX library first (vendor JS/CSS - do not modify)
         $this->hook->on('template:layout:js',  array('template' => 'plugins/DhtmlGantt/Assets/dhtmlxgantt.js'));
         $this->hook->on('template:layout:css', array('template' => 'plugins/DhtmlGantt/Assets/dhtmlxgantt.css'));
 
-        // 2) Our config (sets gantt.config.links, scales, etc.)
+        // 2) Our main integration and behavior (config + all custom logic)
         $this->hook->on('template:layout:js',  array('template' => 'plugins/DhtmlGantt/Assets/dhtmlx-init.js'));
 
-        // 3) Our logic (init, fetch, parse)
-        $this->hook->on('template:layout:js',  array('template' => 'plugins/DhtmlGantt/Assets/gantt.js'));
-        $this->hook->on('template:layout:css', array('template' => 'plugins/DhtmlGantt/Assets/gantt.css'));
+        // 3) Kanboard-specific theme styling (lightbox, workload, dark mode base)
+        $this->hook->on('template:layout:css', array('template' => 'plugins/DhtmlGantt/Assets/gantt-theme.css'));
 
-        // 4) CSP-compliant fixes (must load last to override icon fonts)
-        $this->hook->on('template:layout:css', array('template' => 'plugins/DhtmlGantt/Assets/gantt-csp-fix.css'));
+        // 4) Final overrides / CSP fixes (icon replacements, arrow heads, must load last)
+        $this->hook->on('template:layout:css', array('template' => 'plugins/DhtmlGantt/Assets/gantt-overrides.css'));
 
         //
         // Services
