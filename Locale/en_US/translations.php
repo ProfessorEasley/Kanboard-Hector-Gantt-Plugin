@@ -2,10 +2,19 @@
 
 return array(
     // Main plugin
-    'Advanced Gantt charts with enterprise features powered by DHtmlX Gantt' => 'Advanced Gantt charts with enterprise features powered by DHtmlX Gantt',
+    'Advanced Gantt charts with enterprise features powered by Hector Gantt (built on DHtmlX)' => 'Advanced Gantt charts with enterprise features powered by Hector Gantt (built on DHtmlX)',
+    'Hector Gantt' => 'Hector Gantt',
+    'Hector Gantt chart' => 'Hector Gantt chart',
+    'Hector Gantt chart for "%s"' => 'Hector Gantt chart for "%s"',
     'Gantt chart' => 'Gantt chart',
     'Gantt chart for "%s"' => 'Gantt chart for "%s"',
     'Gantt' => 'Gantt',
+    'Hector Gantt Settings' => 'Hector Gantt Settings',
+    'Hector Gantt Information' => 'Hector Gantt Information',
+    'Hector Gantt Library' => 'Hector Gantt Library',
+    'Download the Hector Gantt library (built on DHtmlX) from' => 'Download the Hector Gantt library (built on DHtmlX) from',
+    'Copy dhtmlxgantt.js and dhtmlxgantt.css to the Assets/ directory' => 'Copy dhtmlxgantt.js and dhtmlxgantt.css to the Assets/ directory',
+    'Navigate to any project and click \"Hector Gantt\" to view your charts' => 'Navigate to any project and click \"Hector Gantt\" to view your charts',
     
     // Toolbar actions
     'Add Task' => 'Add Task',

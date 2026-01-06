@@ -18,7 +18,7 @@ class ConfigController extends BaseController
     public function show()
     {
         $this->response->html($this->helper->layout->config('DhtmlGantt:config/gantt', array(
-            'title' => t('DHtmlX Gantt Settings'),
+            'title' => t('Hector Gantt Settings'),
             'values' => $this->configModel->getAll(),
             'errors' => array(),
         )));
