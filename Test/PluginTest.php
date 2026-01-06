@@ -9,7 +9,7 @@ class PluginTest extends PHPUnit\Framework\TestCase
     public function testGetPluginName()
     {
         $plugin = new Plugin();
-        $this->assertEquals('DHtmlX Gantt', $plugin->getPluginName());
+        $this->assertEquals('Hector Gantt', $plugin->getPluginName());
     }
 
     public function testGetPluginVersion()

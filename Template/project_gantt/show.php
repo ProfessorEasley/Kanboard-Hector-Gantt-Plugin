@@ -1,5 +1,5 @@
 <div class="page-header">
-    <h2><?= t('DHtmlX Gantt chart for "%s"', $project['name']) ?></h2>
+    <h2><?= t('Hector Gantt chart for "%s"', $project['name']) ?></h2>
     <ul>
         <li>
             <?= $this->modal->large('plus', t('Add task'), 'TaskCreationController', 'show', array('project_id' => $project['id'])) ?>

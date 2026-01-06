@@ -2,15 +2,15 @@ plugin := DhtmlGantt
 version := 1.0.0
 
 all:
-	@ echo "DHtmlX Gantt Plugin v$(version)"
+	@ echo "Hector Gantt Plugin v$(version)"
 	@ echo "Available targets:"
 	@ echo "- archive: Create release archive"
 	@ echo "- install: Install to Kanboard (set KANBOARD_DIR)"
 
 archive:
 	@ echo "Creating archive for $(plugin) v$(version)"
-	@ git archive HEAD --prefix=$(plugin)/ --format=zip -o $(plugin)-$(version).zip
-	@ echo "Archive created: $(plugin)-$(version).zip"
+	@ git archive HEAD --prefix=$(plugin)/ --format=zip -o HectorGantt-$(version).zip
+	@ echo "Archive created: HectorGantt-$(version).zip"
 
 install:
 	@ echo "Installing $(plugin) to Kanboard"

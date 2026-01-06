@@ -1,5 +1,5 @@
 <div class="page-header">
-    <h2><?= t('DHtmlX Gantt Settings') ?></h2>
+    <h2><?= t('Hector Gantt Settings') ?></h2>
 </div>
 
 <form method="post" action="<?= $this->url->href('ConfigController', 'save', array('plugin' => 'DhtmlGantt')) ?>" autocomplete="off">
@@ -54,14 +54,14 @@
 </form>
 
 <div class="page-header">
-    <h2><?= t('DHtmlX Gantt Information') ?></h2>
+    <h2><?= t('Hector Gantt Information') ?></h2>
 </div>
 
 <div class="panel">
     <h3><?= t('Plugin Status') ?></h3>
     <ul>
         <li><strong><?= t('Plugin Version') ?>:</strong> 1.0.0</li>
-        <li><strong><?= t('DHtmlX Gantt Library') ?>:</strong> 
+        <li><strong><?= t('Hector Gantt Library') ?>:</strong> 
             <span id="dhtmlx-version">
                 <script>
                 document.addEventListener('DOMContentLoaded', function() {
@@ -78,11 +78,11 @@
 <div class="panel">
     <h3><?= t('Quick Setup Guide') ?></h3>
     <ol>
-        <li><?= t('Download DHtmlX Gantt library from') ?> <a href="https://github.com/DHTMLX/gantt" target="_blank">GitHub (GPL)</a> <?= t('or') ?> <a href="https://dhtmlx.com/docs/products/dhtmlxGantt/" target="_blank">DHtmlX.com (Commercial)</a></li>
-        <li><?= t('Copy dhtmlxgantt.js and dhtmlxgantt.css to Assets/ directory') ?></li>
+        <li><?= t('Download the Hector Gantt library (built on DHtmlX) from') ?> <a href="https://github.com/DHTMLX/gantt" target="_blank">GitHub (GPL)</a> <?= t('or') ?> <a href="https://dhtmlx.com/docs/products/dhtmlxGantt/" target="_blank">DHtmlX.com (Commercial)</a></li>
+        <li><?= t('Copy dhtmlxgantt.js and dhtmlxgantt.css to the Assets/ directory') ?></li>
         <li><?= t('Or enable CDN mode above for quick testing') ?></li>
         <li><?= t('Configure your license type above') ?></li>
-        <li><?= t('Navigate to any project and click "DHtmlX Gantt" to view your charts') ?></li>
+        <li><?= t('Navigate to any project and click \"Hector Gantt\" to view your charts') ?></li>
     </ol>
 </div>
 

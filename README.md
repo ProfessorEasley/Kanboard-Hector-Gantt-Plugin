@@ -1,5 +1,5 @@
 
-## Kanboard DHtmlX Gantt Plugin
+## Kanboard Hector Gantt Plugin
 
 This plugin adds an advanced DHtmlX-based Gantt chart view for Kanboard
 projects, including sprint support, dependency arrows, workload view,
@@ -30,5 +30,4 @@ For maintainers who need to modify behavior:
   - Vendor CSS: `Assets/dhtmlxgantt.css`
   - Theme CSS: `Assets/gantt-theme.css`
   - Override CSS: `Assets/gantt-overrides.css`
-
 

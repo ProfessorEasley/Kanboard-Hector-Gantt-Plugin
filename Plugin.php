@@ -113,12 +113,12 @@ class Plugin extends Base
 
     public function getPluginName()
     {
-        return 'DHtmlX Gantt';
+        return 'Hector Gantt';
     }
 
     public function getPluginDescription()
     {
-        return t('Advanced Gantt charts with enterprise features powered by DHtmlX Gantt');
+        return t('Advanced Gantt charts with enterprise features powered by Hector Gantt (built on DHtmlX)');
     }
 
     public function getPluginAuthor()
